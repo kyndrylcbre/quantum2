@@ -9,22 +9,29 @@
 
 .sidebar .brand {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
   padding: 18px 16px 16px;
 }
 .sidebar .brand .brand-cbre {
-  height: 26px;
+  height: 15px; /* sized to product-name cap height, per Emerald app-header lockup */
   width: auto;
   color: #fff; /* CBRE wordmark reversed on green nav */
   flex: none;
 }
+.sidebar .brand .brand-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.28);
+  flex: none;
+}
 .sidebar .brand .name {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-family: var(--font-body);
+  font-size: 1.25rem; /* 20px, matches Emerald app-header logo */
+  font-weight: 500;
   color: #fff;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.005em;
   line-height: 1;
 }
 
