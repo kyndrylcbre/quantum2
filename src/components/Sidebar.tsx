@@ -10,7 +10,6 @@ export function Sidebar() {
         <div className="brand-divider" />
         <div className="word">
           <div className="name">Quantum</div>
-          <div className="tag">Data Center Ops</div>
         </div>
       </div>
 
