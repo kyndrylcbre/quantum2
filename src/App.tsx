@@ -1,8 +1,9 @@
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import { AppProvider } from './context/AppContext'
+import { AppProvider, useApp } from './context/AppContext'
 import { DataProvider } from './context/DataContext'
 import { Sidebar } from './components/Sidebar'
 import { TopBar } from './components/TopBar'
+import { AppHeader } from './components/AppHeader'
 import { SyncTray } from './components/SyncTray'
 import { MODULES } from './modules'
 import { Stub } from './pages/Stub'
@@ -36,32 +37,58 @@ const BUILT: Record<string, React.ComponentType> = {
   '/projects': Projects,
 }
 
+function Routed() {
+  return (
+    <main className="app-content">
+      <Routes>
+        {MODULES.map(m => {
+          const Built = BUILT[m.path]
+          return (
+            <Route
+              key={m.path}
+              path={m.path}
+              element={Built ? <Built /> : <Stub mod={m} />}
+            />
+          )
+        })}
+        <Route path="*" element={<Stub mod={MODULES[0]} />} />
+      </Routes>
+    </main>
+  )
+}
+
+function Shell() {
+  const { layout } = useApp()
+
+  if (layout === 'appheader') {
+    return (
+      <div className="app-shell-h">
+        <AppHeader />
+        <div className="app-body">
+          <Sidebar variant="nav" />
+          <Routed />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="app-shell">
+      <Sidebar />
+      <div className="app-main">
+        <TopBar />
+        <Routed />
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <AppProvider>
       <DataProvider>
         <HashRouter>
-          <div className="app-shell">
-            <Sidebar />
-            <div className="app-main">
-              <TopBar />
-              <main className="app-content">
-                <Routes>
-                  {MODULES.map(m => {
-                    const Built = BUILT[m.path]
-                    return (
-                      <Route
-                        key={m.path}
-                        path={m.path}
-                        element={Built ? <Built /> : <Stub mod={m} />}
-                      />
-                    )
-                  })}
-                  <Route path="*" element={<Stub mod={MODULES[0]} />} />
-                </Routes>
-              </main>
-            </div>
-          </div>
+          <Shell />
           <SyncTray />
         </HashRouter>
       </DataProvider>

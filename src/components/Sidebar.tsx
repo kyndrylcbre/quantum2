@@ -2,14 +2,17 @@ import { NavLink } from 'react-router-dom'
 import { MODULES } from '../modules'
 import { CbreLogo } from '../emerald'
 
-export function Sidebar() {
+/** `variant="nav"` renders the module nav only (brand lives in the App Header). */
+export function Sidebar({ variant = 'full' }: { variant?: 'full' | 'nav' }) {
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <CbreLogo className="brand-cbre" />
-        <div className="brand-divider" />
-        <div className="name">Quantum</div>
-      </div>
+    <aside className={`sidebar${variant === 'nav' ? ' sidebar--nav' : ''}`}>
+      {variant === 'full' && (
+        <div className="brand">
+          <CbreLogo className="brand-cbre" />
+          <div className="brand-divider" />
+          <div className="name">Quantum</div>
+        </div>
+      )}
 
       <div className="nav-label">Modules</div>
       <nav aria-label="Modules">
