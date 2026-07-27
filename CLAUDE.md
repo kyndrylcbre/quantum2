@@ -23,10 +23,11 @@ no UI framework. `npm run dev` → port 5180 (`.claude/launch.json` has a `quant
 
 ## Design standard
 
-CBRE Emerald approximation (docs.emerald.cbre.com is behind CBRE SSO — tokens were derived from
-public brand standards; refine when access is available). Serif display font (Financier fallback
-Georgia) for headings/stat values, sans (Calibre fallback system) for everything else. Sidebar
-stays CBRE green `#003F2D` in both themes.
+Tokens are now **real Emerald values** extracted from docs.emerald.cbre.com — see
+`docs/emerald-integration.md` for sources, Artifactory install steps, and the deviation log.
+Rules: Calibre (sans) for ALL text on enterprise surfaces — no serif headings; dark mode is
+neutral gray (#1A1A1A family), not green-tinted; primary flips #003F2D (light) ↔ #17E88F (dark);
+chart colors are Emerald data-vis cat-1…4 in fixed order. Sidebar stays CBRE green in light mode.
 
 ## Push-pull data flow
 
