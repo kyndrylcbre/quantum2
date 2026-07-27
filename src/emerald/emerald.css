@@ -1,0 +1,259 @@
+/* ============================================================
+   Emerald React components — recreated from scratch to match
+   the Emerald design system (docs.emerald.cbre.com), since the
+   real @emerald-react/* packages live on CBRE Artifactory and
+   aren't installable here. Anatomy (sizes, radii, states) was
+   measured from the Emerald Storybook on 2026-07-27.
+   All colors come from the token layer in styles/tokens.css.
+   ============================================================ */
+
+/* ---------------- Button ---------------- */
+.em-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-sm); /* 4px */
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1.25;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  position: relative;
+}
+.em-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.em-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* sizes — Emerald: sm 30px, md 36px, lg 48px */
+.em-btn--sm { height: 30px; padding: 0 12px; font-size: 14px; }
+.em-btn--md { height: 36px; padding: 0 16px; font-size: 16px; }
+.em-btn--lg { height: 48px; padding: 0 16px; font-size: 16px; }
+.em-btn--block { width: 100%; }
+
+/* variants */
+.em-btn--primary { background: var(--brand); color: var(--on-brand); }
+.em-btn--primary:hover:not(:disabled) { background: var(--brand-hover); }
+
+.em-btn--secondary { background: transparent; color: var(--brand); border-color: var(--brand); }
+.em-btn--secondary:hover:not(:disabled) { background: var(--accent-soft); }
+
+.em-btn--light { background: var(--surface-3); color: var(--ink); }
+.em-btn--light:hover:not(:disabled) { background: var(--border); }
+
+.em-btn--text { background: transparent; color: var(--brand); padding-left: 8px; padding-right: 8px; }
+.em-btn--text:hover:not(:disabled) { background: var(--accent-soft); }
+
+.em-btn--danger { background: var(--status-critical); color: #fff; }
+.em-btn--danger:hover:not(:disabled) { filter: brightness(0.92); }
+
+.em-btn--danger-secondary { background: transparent; color: var(--status-critical); border-color: var(--status-critical); }
+.em-btn--danger-secondary:hover:not(:disabled) { background: var(--status-critical-soft); }
+
+.em-btn__spinner {
+  width: 14px; height: 14px; flex: none;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: em-spin 0.7s linear infinite;
+}
+@keyframes em-spin { to { transform: rotate(360deg); } }
+.em-btn__icon { display: inline-flex; flex: none; }
+.em-btn__icon svg { width: 1em; height: 1em; }
+
+/* ---------------- IconButton ---------------- */
+.em-iconbtn {
+  display: inline-grid; place-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent; color: var(--ink-2);
+  cursor: pointer; flex: none;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.em-iconbtn--sm { width: 30px; height: 30px; }
+.em-iconbtn--md { width: 36px; height: 36px; }
+.em-iconbtn:hover:not(:disabled) { background: var(--surface-3); color: var(--ink); }
+.em-iconbtn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.em-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.em-iconbtn--outlined { border-color: var(--border-strong); }
+
+/* ---------------- Chip (filter/selection pill) ---------------- */
+.em-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3); color: var(--ink);
+  border: 1px solid transparent;
+  font-size: var(--text-sm); font-weight: 500;
+  cursor: default; white-space: nowrap;
+}
+.em-chip--clickable { cursor: pointer; }
+.em-chip--clickable:hover { background: var(--border); }
+.em-chip--selected { background: var(--accent-soft); color: var(--brand); border-color: var(--brand); }
+.em-chip--disabled { opacity: 0.4; pointer-events: none; }
+.em-chip__close {
+  display: inline-grid; place-items: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  border: none; background: transparent; color: inherit; cursor: pointer;
+  margin-right: -4px;
+}
+.em-chip__close:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ---------------- StatusTag (semantic state) ---------------- */
+.em-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 9px; border-radius: var(--radius-pill);
+  font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.em-tag__dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.em-tag--good { color: var(--status-good); background: var(--status-good-soft); }
+.em-tag--warn { color: var(--status-warn); background: var(--status-warn-soft); }
+.em-tag--serious { color: var(--status-serious); background: var(--status-serious-soft); }
+.em-tag--critical { color: var(--status-critical); background: var(--status-critical-soft); }
+.em-tag--info { color: var(--status-info); background: var(--status-info-soft); }
+.em-tag--neutral { color: var(--status-neutral); background: var(--status-neutral-soft); }
+
+/* ---------------- TextField / Select / Textarea (outlined, floating label) ---------------- */
+.em-field { position: relative; }
+.em-field--block { width: 100%; }
+
+.em-field__control {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--text-md);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+textarea.em-field__control { height: auto; min-height: 88px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+select.em-field__control { appearance: none; padding-right: 34px; cursor: pointer; }
+
+.em-field__control::placeholder { color: var(--ink-3); }
+.em-field__control:hover:not(:disabled) { border-color: var(--ink-2); }
+.em-field__control:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 1px var(--focus-ring);
+}
+.em-field__control:disabled { opacity: 0.5; cursor: not-allowed; background: var(--surface-2); }
+.em-field--error .em-field__control { border-color: var(--status-critical); }
+.em-field--error .em-field__control:focus { box-shadow: 0 0 0 1px var(--status-critical); }
+
+/* floating label sits in the notch of the top border */
+.em-field__label {
+  position: absolute;
+  left: 9px; top: 50%; transform: translateY(-50%);
+  padding: 0 4px;
+  color: var(--ink-3);
+  font-size: var(--text-md);
+  pointer-events: none;
+  transition: top 0.12s ease, font-size 0.12s ease, color 0.12s ease;
+  background: var(--surface);
+  max-width: calc(100% - 24px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.em-field--floated .em-field__label,
+.em-field__control:focus ~ .em-field__label {
+  top: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+.em-field__control:focus ~ .em-field__label { color: var(--focus-ring); }
+.em-field--error .em-field__label { color: var(--status-critical); }
+.em-field--floated.em-field--textarea .em-field__label { top: 0; }
+.em-field__chevron {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; color: var(--ink-3);
+}
+.em-field__hint { margin-top: 4px; font-size: var(--text-xs); color: var(--ink-3); }
+.em-field--error .em-field__hint { color: var(--status-critical); }
+
+/* plain label variant (top-aligned) for compact forms */
+.em-field__toplabel {
+  display: block; margin-bottom: 5px;
+  font-size: var(--text-xs); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
+}
+
+/* ---------------- Checkbox ---------------- */
+.em-checkbox { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: var(--text-sm); color: var(--ink); }
+.em-checkbox input { position: absolute; opacity: 0; width: 0; height: 0; }
+.em-checkbox__box {
+  width: 18px; height: 18px; flex: none;
+  border: 1.5px solid var(--border-strong); border-radius: 3px;
+  background: var(--surface); display: grid; place-items: center;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+.em-checkbox__box svg { width: 12px; height: 12px; color: #fff; opacity: 0; }
+.em-checkbox input:checked ~ .em-checkbox__box { background: var(--brand); border-color: var(--brand); }
+.em-checkbox input:checked ~ .em-checkbox__box svg { opacity: 1; }
+.em-checkbox input:focus-visible ~ .em-checkbox__box { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.em-checkbox--disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------------- Tabs (underline, primary in-page nav) ---------------- */
+.em-tabs {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.em-tab {
+  border: none; background: transparent;
+  padding: 10px 14px 11px;
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: 500;
+  color: var(--ink-2); cursor: pointer;
+  position: relative; white-space: nowrap;
+  transition: color 0.12s ease;
+}
+.em-tab:hover { color: var(--ink); }
+.em-tab--active { color: var(--brand); }
+:root[data-theme="dark"] .em-tab--active { color: var(--ink); }
+.em-tab--active::after {
+  content: ""; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px;
+  background: var(--accent); border-radius: 2px 2px 0 0;
+}
+.em-tab:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; border-radius: 2px; }
+
+/* ---------------- SegmentedControl (Emerald button-group) ---------------- */
+.em-seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.em-seg__btn {
+  border: none; background: var(--surface); color: var(--ink-2);
+  padding: 6px 12px; font-size: var(--text-sm); font-weight: 500; cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+.em-seg__btn + .em-seg__btn { border-left: 1px solid var(--border); }
+.em-seg__btn:hover:not(.em-seg__btn--on) { background: var(--surface-2); }
+.em-seg__btn--on { background: var(--brand); color: var(--on-brand); }
+
+/* ---------------- Tooltip ---------------- */
+.em-tooltip { position: relative; display: inline-flex; }
+.em-tooltip__bubble {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: var(--ink-inverse);
+  font-size: var(--text-xs); font-weight: 500; line-height: 1.35;
+  padding: 5px 9px; border-radius: var(--radius-sm);
+  white-space: nowrap; max-width: 240px; z-index: 70;
+  opacity: 0; pointer-events: none; transition: opacity 0.12s ease;
+  box-shadow: var(--shadow-pop);
+}
+.em-tooltip:hover .em-tooltip__bubble,
+.em-tooltip:focus-within .em-tooltip__bubble { opacity: 1; }
+
+/* ---------------- Card ---------------- */
+.em-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--gap-md);
+  min-width: 0;
+}
+.em-card__title {
+  font-family: var(--font-body);
+  font-size: var(--text-xs); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3);
+  margin-bottom: var(--gap-sm);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gap-sm);
+}

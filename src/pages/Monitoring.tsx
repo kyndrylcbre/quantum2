@@ -10,6 +10,7 @@ import {
 } from '../data'
 import { alarmTone, Badge, Card, ChartTip, equipTone, Segmented, StatTile } from '../components/ui'
 import { axisTick, ChartFrame } from '../components/charts'
+import { EmeraldButton } from '../emerald'
 
 const SEV_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -143,11 +144,11 @@ export function Monitoring() {
                       {a.acked
                         ? <Badge tone="neutral" dot={false}>Acked</Badge>
                         : (
-                          <button className="btn" style={{ padding: '2px 10px', fontSize: 'var(--text-xs)' }}
+                          <EmeraldButton variant="secondary" size="sm"
                             title={`Acknowledge in ${a.system}`}
                             onClick={() => ackAlarm(a.id)}>
                             Ack
-                          </button>
+                          </EmeraldButton>
                         )}
                     </td>
                   </tr>

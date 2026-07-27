@@ -10,6 +10,7 @@ import {
 } from '../data'
 import { Badge, Card, ChartTip, Segmented, StatTile, type BadgeTone } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
+import { EmeraldButton } from '../emerald'
 
 const THIS_YEAR = 2026
 const YEARS = [2026, 2027, 2028, 2029, 2030]
@@ -134,7 +135,7 @@ export function Projects() {
                   <span className="right mono" style={{ fontSize: 'var(--text-xs)' }}>{fmtUSD(c.cost)} · {c.year}</span>
                 </div>
                 <div className="muted" style={{ fontSize: 'var(--text-xs)', margin: '3px 0 7px' }}>{c.reason}</div>
-                <button className="btn" style={{ fontSize: 'var(--text-xs)', padding: '3px 10px' }}
+                <EmeraldButton variant="secondary" size="sm"
                   onClick={() => addProject({
                     siteId: c.asset.siteId,
                     name: `${c.asset.kind} replacement — ${c.asset.name}`,
@@ -147,7 +148,7 @@ export function Projects() {
                     rationale: c.reason,
                   })}>
                   Promote to project → Kahua
-                </button>
+                </EmeraldButton>
               </div>
             ))}
             {candidates.length === 0 && <div className="empty-note">No lifecycle flags in scope</div>}
@@ -240,10 +241,10 @@ function ProjectDetail({ project, onUpdate }: {
       {transitions.length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', marginBottom: 14 }}>
           {transitions.map(t => (
-            <button key={t.to} className="btn"
+            <EmeraldButton key={t.to} variant="secondary" size="sm"
               onClick={() => onUpdate({ status: t.to, completionPct: t.to === 'Complete' ? 100 : project.completionPct }, `${t.label} —`)}>
               {t.label}
-            </button>
+            </EmeraldButton>
           ))}
         </div>
       )}

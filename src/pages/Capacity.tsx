@@ -7,6 +7,7 @@ import { useData } from '../context/DataContext'
 import { getRacks, getSites, SITES, siteById, type Rack } from '../data'
 import { Badge, Card, ChartTip, StatTile } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
+import { EmeraldButton } from '../emerald'
 
 export function Capacity() {
   const { siteId } = useApp()
@@ -74,9 +75,9 @@ export function Capacity() {
           </p>
         </div>
         {hasDcim && (
-          <button className="btn right" onClick={() => pull(siteId === 'all' ? 'Nlyte DCIM' : sites[0].dcim, 'Refresh rack inventory & load')}>
+          <EmeraldButton variant="secondary" className="right" onClick={() => pull(siteId === 'all' ? 'Nlyte DCIM' : sites[0].dcim, 'Refresh rack inventory & load')}>
             ⟳ Pull latest from {siteId === 'all' ? 'DCIMs' : dcimName.split(' ')[0]}
-          </button>
+          </EmeraldButton>
         )}
       </div>
 
@@ -123,10 +124,10 @@ export function Capacity() {
                 <div className="muted" style={{ fontSize: 'var(--text-xs)', margin: '3px 0 7px' }}>
                   {s.from.name} at {Math.round((s.from.powerKw / s.from.capacityKw) * 100)}% power · {s.to.name} at {Math.round((s.to.powerKw / s.to.capacityKw) * 100)}%
                 </div>
-                <button className="btn" style={{ fontSize: 'var(--text-xs)', padding: '3px 10px' }}
+                <EmeraldButton variant="secondary" size="sm"
                   onClick={() => pull(siteById(s.from.siteId)?.dcim ?? 'DCIM', `Push move plan ${s.from.name} → ${s.to.name}`)}>
                   Push plan to DCIM
-                </button>
+                </EmeraldButton>
               </div>
             ))}
           </div>

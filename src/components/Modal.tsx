@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { EmeraldIconButton } from '../emerald'
 
 export function Modal({ title, onClose, children }: {
   title: string
@@ -16,7 +17,7 @@ export function Modal({ title, onClose, children }: {
       <div className="modal" role="dialog" aria-modal="true" aria-label={title} onClick={e => e.stopPropagation()}>
         <div className="modal-head">
           <h2>{title}</h2>
-          <button className="btn" onClick={onClose} aria-label="Close dialog">✕</button>
+          <EmeraldIconButton label="Close dialog" onClick={onClose}>✕</EmeraldIconButton>
         </div>
         {children}
       </div>

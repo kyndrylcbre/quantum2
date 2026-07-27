@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { scoped, useData } from '../context/DataContext'
 import { getSites, SITES, type RoundInstance, type ShiftName } from '../data'
 import { Badge, Card, Segmented, StatTile } from '../components/ui'
+import { EmeraldButton, EmeraldTextarea } from '../emerald'
 import '../styles/birdseye.css'
 
 export function Rounds() {
@@ -90,18 +91,17 @@ function SiteRounds({ siteId }: { siteId: string }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--gap-md)' }}>
           <Card title="Publish shift handover">
             <form onSubmit={submitHandover}>
-              <div className="field">
-                <textarea
-                  value={note}
-                  placeholder="What does the incoming shift need to know?"
-                  onChange={e => setNote(e.target.value)}
-                  aria-label="Handover note"
-                />
-              </div>
+              <EmeraldTextarea
+                block
+                value={note}
+                placeholder="What does the incoming shift need to know?"
+                onChange={e => setNote(e.target.value)}
+                aria-label="Handover note"
+              />
               <div className="modal-actions" style={{ marginTop: 10 }}>
-                <button className="btn primary" type="submit" disabled={!note.trim()}>
+                <EmeraldButton type="submit" disabled={!note.trim()}>
                   Publish handover
-                </button>
+                </EmeraldButton>
               </div>
             </form>
           </Card>
@@ -118,7 +118,7 @@ function SiteRounds({ siteId }: { siteId: string }) {
                     <span className="right">
                       {h.acknowledged
                         ? <Badge tone="good" dot={false}>Acked</Badge>
-                        : <button className="btn" style={{ padding: '2px 10px', fontSize: 'var(--text-xs)' }} onClick={() => ackHandover(h.id)}>Acknowledge</button>}
+                        : <EmeraldButton variant="secondary" size="sm" onClick={() => ackHandover(h.id)}>Acknowledge</EmeraldButton>}
                     </span>
                   </div>
                   <div style={{ fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>{h.note}</div>
@@ -184,9 +184,9 @@ function ReadingInput({ unit, onSave }: { unit: string; onSave: (v: number) => v
         onChange={e => setVal(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && save()}
       />
-      <button className="btn" style={{ padding: '4px 10px', fontSize: 'var(--text-xs)' }} onClick={save} disabled={!val.trim()}>
+      <EmeraldButton variant="secondary" size="sm" onClick={save} disabled={!val.trim()}>
         Log
-      </button>
+      </EmeraldButton>
     </span>
   )
 }

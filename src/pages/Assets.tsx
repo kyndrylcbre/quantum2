@@ -6,6 +6,7 @@ import {
   type EquipKind, type MechEquipment,
 } from '../data'
 import { Badge, Card, equipTone, StatTile } from '../components/ui'
+import { EmeraldButton } from '../emerald'
 
 const KINDS: EquipKind[] = ['UPS', 'Generator', 'Switchgear', 'PDU', 'Chiller', 'CRAH', 'CRAC']
 const THIS_YEAR = 2026
@@ -46,9 +47,9 @@ export function Assets() {
             Asset registry with condition and maintenance history — the backbone for capital planning in the Projects module.
           </p>
         </div>
-        <button className="btn right" onClick={() => pull(siteId === 'all' ? 'SI7 CMMS' : siteById(siteId)?.cmms ?? 'CMMS', 'Refresh asset registry & histories')}>
+        <EmeraldButton variant="secondary" className="right" onClick={() => pull(siteId === 'all' ? 'SI7 CMMS' : siteById(siteId)?.cmms ?? 'CMMS', 'Refresh asset registry & histories')}>
           ⟳ Pull registry from CMMS
-        </button>
+        </EmeraldButton>
       </div>
 
       <div className="grid cols-4" style={{ marginBottom: 'var(--gap-md)' }}>

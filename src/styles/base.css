@@ -210,18 +210,21 @@ button {
 
 .table-scroll { overflow-x: auto; }
 
-/* ---------- buttons & inputs ---------- */
+/* ---------- buttons & inputs (Emerald-aligned fallbacks) ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   border: 1px solid var(--border-strong);
   background: var(--surface);
   color: var(--ink);
   border-radius: var(--radius-sm);
-  padding: 6px 14px;
+  min-height: 36px;
+  padding: 6px 16px;
   font-size: var(--text-sm);
   font-weight: 500;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .btn:hover { background: var(--surface-2); }
 .btn.primary {
@@ -237,9 +240,17 @@ button {
   background: var(--surface);
   color: var(--ink);
   border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  font-size: var(--text-sm);
+  height: 40px;
+  padding: 0 12px;
+  font-size: var(--text-md);
   font-family: inherit;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 1px var(--focus-ring);
 }
 
 /* ---------- filter row ---------- */
@@ -440,6 +451,7 @@ button {
 /* reading input on rounds */
 .reading-input {
   width: 88px;
+  height: 30px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }

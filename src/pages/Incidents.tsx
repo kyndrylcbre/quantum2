@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { scoped, useData } from '../context/DataContext'
 import { siteById, type Incident, type IncidentSeverity, type IncidentStatus } from '../data'
 import { Badge, Card, Segmented, sevTone, StatTile } from '../components/ui'
+import { EmeraldButton, EmeraldTextarea } from '../emerald'
 
 const SEV_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -137,9 +138,10 @@ function IncidentDetail({ incident, onUpdate }: {
 
       <div className="row" style={{ flexWrap: 'wrap', marginBottom: 14 }}>
         {transitions.map(t => (
-          <button
+          <EmeraldButton
             key={t.to}
-            className="btn"
+            variant="secondary"
+            size="sm"
             disabled={t.to === 'Closed' && !rcaText.trim()}
             title={t.to === 'Closed' && !rcaText.trim() ? 'RCA required before closing' : undefined}
             onClick={() => onUpdate(
@@ -148,7 +150,7 @@ function IncidentDetail({ incident, onUpdate }: {
             )}
           >
             {t.label}
-          </button>
+          </EmeraldButton>
         ))}
       </div>
 
@@ -164,22 +166,19 @@ function IncidentDetail({ incident, onUpdate }: {
         {incident.notified.map(n => <Badge key={n} tone="neutral" dot={false}>{n}</Badge>)}
       </div>
 
-      <div className="field">
-        <label htmlFor="rca">Root cause analysis {incident.rcaComplete && '— complete'}</label>
-        <textarea
-          id="rca"
-          style={{ minHeight: 140 }}
-          value={rcaText}
-          placeholder="Timeline, root cause, contributing factors, corrective actions…"
-          onChange={e => setDraft(e.target.value)}
-        />
-      </div>
+      <EmeraldTextarea
+        label={`Root cause analysis${incident.rcaComplete ? ' — complete' : ''}`}
+        block
+        style={{ minHeight: 140 }}
+        value={rcaText}
+        onChange={e => setDraft(e.target.value)}
+      />
       {draft !== null && draft !== incident.rcaText && (
         <div className="modal-actions" style={{ marginTop: 8 }}>
-          <button className="btn" onClick={() => setDraft(null)}>Discard</button>
-          <button className="btn primary" onClick={() => { onUpdate({ rcaText: draft }, 'Save RCA draft —'); setDraft(null) }}>
+          <EmeraldButton variant="text" onClick={() => setDraft(null)}>Discard</EmeraldButton>
+          <EmeraldButton onClick={() => { onUpdate({ rcaText: draft }, 'Save RCA draft —'); setDraft(null) }}>
             Save RCA
-          </button>
+          </EmeraldButton>
         </div>
       )}
     </Card>

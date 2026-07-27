@@ -4,6 +4,7 @@ import { scoped, useData } from '../context/DataContext'
 import { SITES, siteById, type HseCategory, type HseEntry, type HseKind } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, Segmented, StatTile, type BadgeTone } from '../components/ui'
+import { EmeraldButton, EmeraldCheckbox, EmeraldSelect, EmeraldTextarea } from '../emerald'
 
 const KIND_TONE: Record<HseKind, BadgeTone> = {
   Observation: 'info', 'Near Miss': 'warn', Incident: 'critical',
@@ -44,7 +45,7 @@ export function HSE() {
             Health & safety observations, near misses, and incidents — recorded at the point of work.
           </p>
         </div>
-        <button className="btn primary right" onClick={() => setShowNew(true)}>+ Log entry</button>
+        <EmeraldButton className="right" onClick={() => setShowNew(true)}>+ Log entry</EmeraldButton>
       </div>
 
       <div className="grid cols-4" style={{ marginBottom: 'var(--gap-md)' }}>
@@ -109,9 +110,9 @@ export function HSE() {
                   </td>
                   <td>
                     {e.status === 'Open' && (
-                      <button className="btn" style={{ padding: '3px 10px', fontSize: 'var(--text-xs)' }} onClick={() => setClosing(e)}>
+                      <EmeraldButton variant="secondary" size="sm" onClick={() => setClosing(e)}>
                         Close out
-                      </button>
+                      </EmeraldButton>
                     )}
                   </td>
                 </tr>
@@ -162,45 +163,37 @@ function NewHseModal({ defaultSite, onClose }: { defaultSite: string; onClose: (
     <Modal title="Log HSE entry" onClose={onClose}>
       <form onSubmit={submit}>
         <div className="form-grid">
-          <div className="field">
-            <label htmlFor="hse-site">Site</label>
-            <select id="hse-site" className="select" value={form.siteId}
-              onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-              {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="hse-kind">Type</label>
-            <select id="hse-kind" className="select" value={form.kind}
-              onChange={e => setForm(f => ({ ...f, kind: e.target.value as HseKind }))}>
-              <option>Observation</option><option>Near Miss</option><option>Incident</option>
-            </select>
-          </div>
-          <div className="field full">
-            <label htmlFor="hse-cat">Category</label>
-            <select id="hse-cat" className="select" value={form.category}
+          <EmeraldSelect label="Site" block value={form.siteId}
+            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
+            {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
+          </EmeraldSelect>
+          <EmeraldSelect label="Type" block value={form.kind}
+            onChange={e => setForm(f => ({ ...f, kind: e.target.value as HseKind }))}>
+            <option>Observation</option><option>Near Miss</option><option>Incident</option>
+          </EmeraldSelect>
+          <div className="full">
+            <EmeraldSelect label="Category" block value={form.category}
               onChange={e => setForm(f => ({ ...f, category: e.target.value as HseCategory }))}>
               {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </select>
+            </EmeraldSelect>
           </div>
-          <div className="field full">
-            <label htmlFor="hse-desc">What happened / what was observed</label>
-            <textarea id="hse-desc" autoFocus value={form.description}
+          <div className="full">
+            <EmeraldTextarea label="What happened / what was observed" block autoFocus value={form.description}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
           </div>
           {form.kind === 'Incident' && (
-            <div className="field full row" style={{ gap: 8 }}>
-              <input id="hse-rec" type="checkbox" checked={form.recordable}
-                onChange={e => setForm(f => ({ ...f, recordable: e.target.checked }))} />
-              <label htmlFor="hse-rec" style={{ margin: 0, textTransform: 'none', letterSpacing: 0 }}>
-                OSHA-recordable injury or illness
-              </label>
+            <div className="full">
+              <EmeraldCheckbox
+                label="OSHA-recordable injury or illness"
+                checked={form.recordable}
+                onChange={e => setForm(f => ({ ...f, recordable: e.target.checked }))}
+              />
             </div>
           )}
         </div>
         <div className="modal-actions">
-          <button type="button" className="btn" onClick={onClose}>Cancel</button>
-          <button type="submit" className="btn primary" disabled={!form.description.trim()}>Log entry</button>
+          <EmeraldButton type="button" variant="text" onClick={onClose}>Cancel</EmeraldButton>
+          <EmeraldButton type="submit" disabled={!form.description.trim()}>Log entry</EmeraldButton>
         </div>
       </form>
     </Modal>
@@ -216,16 +209,13 @@ function CloseHseModal({ entry, onClose, onSubmit }: {
   return (
     <Modal title={`Close out ${entry.id}`} onClose={onClose}>
       <p className="muted" style={{ fontSize: 'var(--text-sm)', marginBottom: 12 }}>{entry.description}</p>
-      <div className="field">
-        <label htmlFor="hse-action">Corrective action taken</label>
-        <textarea id="hse-action" autoFocus value={action} onChange={e => setAction(e.target.value)}
-          placeholder="e.g. Area barricaded, toolbox talk delivered, permit checklist updated…" />
-      </div>
+      <EmeraldTextarea label="Corrective action taken" block autoFocus value={action}
+        onChange={e => setAction(e.target.value)} />
       <div className="modal-actions">
-        <button className="btn" onClick={onClose}>Cancel</button>
-        <button className="btn primary" disabled={!action.trim()} onClick={() => onSubmit(action.trim())}>
+        <EmeraldButton variant="text" onClick={onClose}>Cancel</EmeraldButton>
+        <EmeraldButton disabled={!action.trim()} onClick={() => onSubmit(action.trim())}>
           Close entry
-        </button>
+        </EmeraldButton>
       </div>
     </Modal>
   )

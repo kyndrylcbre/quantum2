@@ -4,6 +4,7 @@ import { scoped, useData } from '../context/DataContext'
 import { SITES, siteById, type Risk, type RiskCategory, type RiskOwner, type RiskStatus } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, StatTile, type BadgeTone } from '../components/ui'
+import { EmeraldButton, EmeraldSelect, EmeraldTextField, EmeraldTextarea } from '../emerald'
 
 const CATEGORIES: RiskCategory[] = [
   'Power resilience', 'Cooling resilience', 'Fire protection', 'Water / leak',
@@ -58,7 +59,7 @@ export function Risk() {
             Living risk register — who owns each risk (CBRE, client, or shared) and what's being done about it.
           </p>
         </div>
-        <button className="btn primary right" onClick={() => setShowNew(true)}>+ Register risk</button>
+        <EmeraldButton className="right" onClick={() => setShowNew(true)}>+ Register risk</EmeraldButton>
       </div>
 
       <div className="grid cols-4" style={{ marginBottom: 'var(--gap-md)' }}>
@@ -86,9 +87,9 @@ export function Risk() {
           <div className="row" style={{ marginTop: 8, justifyContent: 'space-between' }}>
             <span className="muted" style={{ fontSize: 'var(--text-xs)' }}>likelihood →, impact ↑</span>
             {cell && (
-              <button className="btn" style={{ padding: '2px 10px', fontSize: 'var(--text-xs)' }} onClick={() => setCell(null)}>
+              <EmeraldButton variant="text" size="sm" onClick={() => setCell(null)}>
                 Clear filter
-              </button>
+              </EmeraldButton>
             )}
           </div>
         </Card>
@@ -187,7 +188,7 @@ function RiskDetail({ risk, onUpdate, onDismiss }: {
     : [{ label: 'Reopen', to: 'Open' }]
 
   return (
-    <Card title={`${risk.id} — ${risk.title}`} action={<button className="btn" onClick={onDismiss}>✕</button>}>
+    <Card title={`${risk.id} — ${risk.title}`} action={<EmeraldButton variant="text" size="sm" onClick={onDismiss}>✕</EmeraldButton>}>
       <div className="grid cols-3">
         <div>
           <dl className="detail-kv">
@@ -204,13 +205,13 @@ function RiskDetail({ risk, onUpdate, onDismiss }: {
           <p style={{ fontSize: 'var(--text-sm)', lineHeight: 1.6, marginBottom: 12 }}>{risk.mitigation}</p>
           <div className="row" style={{ flexWrap: 'wrap' }}>
             {transitions.map(t => (
-              <button key={t.to} className="btn" onClick={() => onUpdate({ status: t.to }, `${t.label} —`)}>
+              <EmeraldButton key={t.to} variant="secondary" size="sm" onClick={() => onUpdate({ status: t.to }, `${t.label} —`)}>
                 {t.label}
-              </button>
+              </EmeraldButton>
             ))}
-            <button className="btn" onClick={() => onUpdate({ reviewInDays: 90 }, 'Mark reviewed —')}>
+            <EmeraldButton variant="text" size="sm" onClick={() => onUpdate({ reviewInDays: 90 }, 'Mark reviewed —')}>
               Mark reviewed (next in 90d)
-            </button>
+            </EmeraldButton>
           </div>
         </div>
       </div>
@@ -250,55 +251,40 @@ function NewRiskModal({ defaultSite, onClose }: { defaultSite: string; onClose: 
     <Modal title="Register new risk" onClose={onClose}>
       <form onSubmit={submit}>
         <div className="form-grid">
-          <div className="field full">
-            <label htmlFor="rk-title">Risk description</label>
-            <input id="rk-title" className="input" autoFocus value={form.title}
+          <div className="full">
+            <EmeraldTextField label="Risk description" block autoFocus value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           </div>
-          <div className="field">
-            <label htmlFor="rk-site">Site</label>
-            <select id="rk-site" className="select" value={form.siteId}
-              onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-              {SITES.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="rk-cat">Category</label>
-            <select id="rk-cat" className="select" value={form.category}
-              onChange={e => setForm(f => ({ ...f, category: e.target.value as RiskCategory }))}>
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="rk-like">Likelihood (1–5)</label>
-            <select id="rk-like" className="select" value={form.likelihood}
-              onChange={e => setForm(f => ({ ...f, likelihood: Number(e.target.value) }))}>
-              {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="rk-imp">Impact (1–5)</label>
-            <select id="rk-imp" className="select" value={form.impact}
-              onChange={e => setForm(f => ({ ...f, impact: Number(e.target.value) }))}>
-              {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-            </select>
-          </div>
-          <div className="field full">
-            <label htmlFor="rk-owner">Risk owner</label>
-            <select id="rk-owner" className="select" value={form.owner}
+          <EmeraldSelect label="Site" block value={form.siteId}
+            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
+            {SITES.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
+          </EmeraldSelect>
+          <EmeraldSelect label="Category" block value={form.category}
+            onChange={e => setForm(f => ({ ...f, category: e.target.value as RiskCategory }))}>
+            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+          </EmeraldSelect>
+          <EmeraldSelect label="Likelihood (1–5)" block value={form.likelihood}
+            onChange={e => setForm(f => ({ ...f, likelihood: Number(e.target.value) }))}>
+            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+          </EmeraldSelect>
+          <EmeraldSelect label="Impact (1–5)" block value={form.impact}
+            onChange={e => setForm(f => ({ ...f, impact: Number(e.target.value) }))}>
+            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+          </EmeraldSelect>
+          <div className="full">
+            <EmeraldSelect label="Risk owner" block value={form.owner}
               onChange={e => setForm(f => ({ ...f, owner: e.target.value as RiskOwner }))}>
               <option>CBRE</option><option>Client</option><option>Shared</option>
-            </select>
+            </EmeraldSelect>
           </div>
-          <div className="field full">
-            <label htmlFor="rk-mit">Mitigation plan</label>
-            <textarea id="rk-mit" value={form.mitigation}
+          <div className="full">
+            <EmeraldTextarea label="Mitigation plan" block value={form.mitigation}
               onChange={e => setForm(f => ({ ...f, mitigation: e.target.value }))} />
           </div>
         </div>
         <div className="modal-actions">
-          <button type="button" className="btn" onClick={onClose}>Cancel</button>
-          <button type="submit" className="btn primary" disabled={!form.title.trim()}>Register risk</button>
+          <EmeraldButton type="button" variant="text" onClick={onClose}>Cancel</EmeraldButton>
+          <EmeraldButton type="submit" disabled={!form.title.trim()}>Register risk</EmeraldButton>
         </div>
       </form>
     </Modal>

@@ -7,6 +7,7 @@ import { useData } from '../context/DataContext'
 import { getOps, getSites, siteById } from '../data'
 import { Badge, Card, ChartTip, StatTile } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
+import { EmeraldButton } from '../emerald'
 
 const fmtUSD = (n: number) =>
   n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(2)}M` : `$${(n / 1000).toFixed(0)}k`
@@ -59,9 +60,9 @@ export function Operations() {
             Cost to operate each facility — FTE, hard and soft services split across raised floor and M&E, with the scope of work behind it.
           </p>
         </div>
-        <button className="btn right" onClick={() => pull('Workday (FTE roster)', 'Refresh FTE roster & rates')}>
+        <EmeraldButton variant="secondary" className="right" onClick={() => pull('Workday (FTE roster)', 'Refresh FTE roster & rates')}>
           ⟳ Pull roster from Workday
-        </button>
+        </EmeraldButton>
       </div>
 
       <div className="grid cols-4" style={{ marginBottom: 'var(--gap-md)' }}>

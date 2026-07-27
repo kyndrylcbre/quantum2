@@ -1,4 +1,10 @@
+/* Shared UI primitives. Card / Badge / Segmented / StatTile are now thin
+   wrappers over the recreated Emerald component library (src/emerald), so the
+   whole app renders Emerald-spec components. Tone maps and ChartTip live here. */
 import type { ReactNode } from 'react'
+import {
+  EmeraldCard, EmeraldTag, EmeraldSegmented, type EmeraldTagTone,
+} from '../emerald'
 
 /* ---------------- Card ---------------- */
 export function Card({ title, action, children, className = '' }: {
@@ -7,17 +13,7 @@ export function Card({ title, action, children, className = '' }: {
   children: ReactNode
   className?: string
 }) {
-  return (
-    <section className={`card ${className}`}>
-      {title != null && (
-        <div className="card-title">
-          <span>{title}</span>
-          {action}
-        </div>
-      )}
-      {children}
-    </section>
-  )
+  return <EmeraldCard title={title} action={action} className={className}>{children}</EmeraldCard>
 }
 
 /* ---------------- StatTile ---------------- */
@@ -28,8 +24,8 @@ export function StatTile({ label, value, unit, sub }: {
   sub?: ReactNode
 }) {
   return (
-    <section className="card stat-tile">
-      <div className="card-title"><span>{label}</span></div>
+    <section className="em-card stat-tile">
+      <div className="em-card__title"><span>{label}</span></div>
       <div className="stat-value">
         {value}
         {unit && <span className="stat-unit">{unit}</span>}
@@ -39,43 +35,24 @@ export function StatTile({ label, value, unit, sub }: {
   )
 }
 
-/* ---------------- Badge ---------------- */
-export type BadgeTone = 'good' | 'warn' | 'serious' | 'critical' | 'info' | 'neutral'
+/* ---------------- Badge (Emerald StatusTag) ---------------- */
+export type BadgeTone = EmeraldTagTone
 
 export function Badge({ tone, children, dot = true }: {
   tone: BadgeTone
   children: ReactNode
   dot?: boolean
 }) {
-  return (
-    <span className={`badge ${tone}`}>
-      {dot && <span className="dot" aria-hidden />}
-      {children}
-    </span>
-  )
+  return <EmeraldTag tone={tone} dot={dot}>{children}</EmeraldTag>
 }
 
-/* ---------------- Segmented control ---------------- */
+/* ---------------- Segmented (Emerald button-group) ---------------- */
 export function Segmented<T extends string>({ options, value, onChange }: {
   options: readonly { value: T; label: string }[]
   value: T
   onChange: (v: T) => void
 }) {
-  return (
-    <div className="seg" role="tablist">
-      {options.map(o => (
-        <button
-          key={o.value}
-          role="tab"
-          aria-selected={o.value === value}
-          className={o.value === value ? 'on' : ''}
-          onClick={() => onChange(o.value)}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  )
+  return <EmeraldSegmented options={options} value={value} onChange={onChange} />
 }
 
 /* ---------------- Recharts tooltip ---------------- */

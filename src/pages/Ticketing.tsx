@@ -7,6 +7,7 @@ import {
 } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, priorityTone, Segmented, StatTile, ticketTone } from '../components/ui'
+import { EmeraldButton, EmeraldSelect, EmeraldTextField } from '../emerald'
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -55,7 +56,7 @@ export function Ticketing() {
             Bi-directional work order sync with each site’s CMMS of record — create, update, and close from Quantum.
           </p>
         </div>
-        <button className="btn primary right" onClick={() => setShowNew(true)}>+ New work order</button>
+        <EmeraldButton className="right" onClick={() => setShowNew(true)}>+ New work order</EmeraldButton>
       </div>
 
       <div className="grid cols-4" style={{ marginBottom: 'var(--gap-md)' }}>
@@ -172,9 +173,10 @@ function TicketDetail({ ticket, allSites, onUpdate }: {
 
       <div className="row" style={{ flexWrap: 'wrap', marginBottom: 14 }}>
         {transitions.map(tr => (
-          <button key={tr.to} className="btn" onClick={() => onUpdate({ status: tr.to, slaBreached: tr.to === 'Resolved' || tr.to === 'Closed' ? false : ticket.slaBreached }, `${tr.label} —`)}>
+          <EmeraldButton key={tr.to} variant="secondary" size="sm"
+            onClick={() => onUpdate({ status: tr.to, slaBreached: tr.to === 'Resolved' || tr.to === 'Closed' ? false : ticket.slaBreached }, `${tr.label} —`)}>
             {tr.label}
-          </button>
+          </EmeraldButton>
         ))}
       </div>
 
@@ -195,16 +197,15 @@ function TicketDetail({ ticket, allSites, onUpdate }: {
         <dt>System of record</dt><dd>{ticket.source}</dd>
       </dl>
 
-      <div className="field" style={{ marginTop: 14 }}>
-        <label htmlFor="assignee">Assignee — pushes to {ticket.source}</label>
-        <select
-          id="assignee"
-          className="select"
+      <div style={{ marginTop: 14 }}>
+        <EmeraldSelect
+          label={`Assignee — pushes to ${ticket.source}`}
+          block
           value={ticket.assignee}
           onChange={e => onUpdate({ assignee: e.target.value }, `Reassign to ${e.target.value} —`)}
         >
           {TECHS.map(t => <option key={t}>{t}</option>)}
-        </select>
+        </EmeraldSelect>
       </div>
     </Card>
   )
@@ -246,55 +247,40 @@ function NewTicketModal({ defaultSite, onClose }: { defaultSite: string; onClose
     <Modal title="New work order" onClose={onClose}>
       <form onSubmit={submit}>
         <div className="form-grid">
-          <div className="field full">
-            <label htmlFor="nt-title">Title</label>
-            <input id="nt-title" className="input" autoFocus value={form.title}
-              placeholder="e.g. Smart hands: swap failed PSU in rack C-04"
+          <div className="full">
+            <EmeraldTextField label="Title" block autoFocus value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           </div>
-          <div className="field">
-            <label htmlFor="nt-site">Site</label>
-            <select id="nt-site" className="select" value={form.siteId}
-              onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-              {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="nt-type">Type</label>
-            <select id="nt-type" className="select" value={form.type}
-              onChange={e => setForm(f => ({ ...f, type: e.target.value as TicketType }))}>
-              <option>Reactive</option><option>Preventative</option>
-              <option>Hands & Eyes</option><option>Project Support</option>
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="nt-space">Space</label>
-            <select id="nt-space" className="select" value={form.space}
-              onChange={e => setForm(f => ({ ...f, space: e.target.value as TicketSpace }))}>
-              <option>Whitespace</option><option>M&E</option><option>Facility</option>
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="nt-priority">Priority</label>
-            <select id="nt-priority" className="select" value={form.priority}
-              onChange={e => setForm(f => ({ ...f, priority: e.target.value as TicketPriority }))}>
-              <option>P1</option><option>P2</option><option>P3</option><option>P4</option>
-            </select>
-          </div>
-          <div className="field full">
-            <label htmlFor="nt-assignee">Assignee</label>
-            <select id="nt-assignee" className="select" value={form.assignee}
+          <EmeraldSelect label="Site" block value={form.siteId}
+            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
+            {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
+          </EmeraldSelect>
+          <EmeraldSelect label="Type" block value={form.type}
+            onChange={e => setForm(f => ({ ...f, type: e.target.value as TicketType }))}>
+            <option>Reactive</option><option>Preventative</option>
+            <option>Hands & Eyes</option><option>Project Support</option>
+          </EmeraldSelect>
+          <EmeraldSelect label="Space" block value={form.space}
+            onChange={e => setForm(f => ({ ...f, space: e.target.value as TicketSpace }))}>
+            <option>Whitespace</option><option>M&E</option><option>Facility</option>
+          </EmeraldSelect>
+          <EmeraldSelect label="Priority" block value={form.priority}
+            onChange={e => setForm(f => ({ ...f, priority: e.target.value as TicketPriority }))}>
+            <option>P1</option><option>P2</option><option>P3</option><option>P4</option>
+          </EmeraldSelect>
+          <div className="full">
+            <EmeraldSelect label="Assignee" block value={form.assignee}
               onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))}>
               {TECHS.map(t => <option key={t}>{t}</option>)}
-            </select>
+            </EmeraldSelect>
           </div>
         </div>
         <p className="muted" style={{ marginTop: 14, fontSize: 'var(--text-xs)' }}>
           On save, Quantum pushes this work order to <strong>{cmms}</strong> (the site’s system of record) and tracks the returned reference.
         </p>
         <div className="modal-actions">
-          <button type="button" className="btn" onClick={onClose}>Cancel</button>
-          <button type="submit" className="btn primary" disabled={!form.title.trim()}>Create & push to {cmms?.split(' ')[0]}</button>
+          <EmeraldButton type="button" variant="text" onClick={onClose}>Cancel</EmeraldButton>
+          <EmeraldButton type="submit" disabled={!form.title.trim()}>Create &amp; push to {cmms?.split(' ')[0]}</EmeraldButton>
         </div>
       </form>
     </Modal>
