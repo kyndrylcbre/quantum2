@@ -1,8 +1,8 @@
 import { hashSeed, mulberry32, pick, randFloat, randInt, weighted, type Rng } from './rng'
 import { SITES } from './sites'
 import type {
-  Alarm, HandoverNote, Incident, Integration, MaintenanceEntry, MechEquipment,
-  OpsProfile, Rack, RoundInstance, SeriesPoint, ServiceLine, Site, Ticket,
+  Alarm, HandoverNote, HseEntry, Incident, Integration, MaintenanceEntry, MechEquipment,
+  OpsProfile, Project, Rack, Risk, RoundInstance, SeriesPoint, ServiceLine, Site, Ticket,
 } from './types'
 
 export const TECHS = [
@@ -381,6 +381,131 @@ export function historyFor(equip: MechEquipment): MaintenanceEntry[] {
       by: pick(rng, TECHS),
     }
   }).sort((a, b) => a.daysAgo - b.daysAgo)
+}
+
+/* ------------------------------- HSE ------------------------------- */
+
+const HSE_TEMPLATES: [HseEntry['kind'], HseEntry['category'], string][] = [
+  ['Observation', 'Housekeeping', 'Packaging left in hot aisle after rack & stack — removed and vendor briefed.'],
+  ['Observation', 'PPE compliance', 'Contractor observed without arc-flash PPE near open switchgear panel.'],
+  ['Observation', 'Contractor control', 'Vendor working without signed permit displayed at point of work.'],
+  ['Observation', 'Electrical safety', 'Temporary extension lead run across gallery walkway.'],
+  ['Near Miss', 'Slips / trips / falls', 'Lifted floor tile left unattended and unbarricaded in whitespace.'],
+  ['Near Miss', 'Working at height', 'Ladder used on uneven surface during cable tray work.'],
+  ['Near Miss', 'Manual handling', 'Two-person server lift attempted solo — stopped before injury.'],
+  ['Incident', 'Slips / trips / falls', 'Technician slipped on condensation near CRAH; bruising, first-aid case.'],
+  ['Incident', 'Manual handling', 'Back strain reported after moving UPS batteries without trolley.'],
+  ['Incident', 'Chemical / COSHH', 'Minor splash during water treatment dosing; eye wash used, no injury.'],
+]
+
+export function hseFor(site: Site): HseEntry[] {
+  const rng = mulberry32(hashSeed(site.id + ':hse'))
+  const n = randInt(rng, 5, 12)
+  return Array.from({ length: n }, (_, i) => {
+    const [kind, category, description] = pick(rng, HSE_TEMPLATES)
+    const daysAgo = randInt(rng, 0, 180)
+    const closed = daysAgo > 14 || rng() < 0.4
+    return {
+      id: `HSE-${hashSeed(site.id + i) % 9000 + 1000}`,
+      siteId: site.id,
+      kind,
+      category,
+      description,
+      reportedBy: pick(rng, TECHS),
+      daysAgo,
+      status: (closed ? 'Closed' : 'Open') as HseEntry['status'],
+      recordable: kind === 'Incident' && rng() < 0.4,
+      correctiveAction: closed
+        ? 'Toolbox talk delivered; area inspected; control added to permit checklist.'
+        : '',
+    }
+  }).sort((a, b) => a.daysAgo - b.daysAgo)
+}
+
+/* ------------------------------ risks ------------------------------ */
+
+const RISK_TEMPLATES: [string, Risk['category'], string][] = [
+  ['Single chilled water header serves both halls', 'Single point of failure', 'Design study for header cross-connect; interim: spool piece staged on site.'],
+  ['UPS batteries beyond 80% design life', 'Power resilience', 'Replacement programmed in capital plan; quarterly impedance testing meanwhile.'],
+  ['Generator fuel contract has 48h refill SLA', 'Power resilience', 'Negotiate 24h SLA or add on-site storage; monitor levels via BMS.'],
+  ['VESDA coverage gap in new build zone', 'Fire protection', 'Interim smoke detection installed; permanent design change submitted.'],
+  ['Legacy BMS controllers out of vendor support', 'Cooling resilience', 'Spares purchased; migration to supported platform scoped.'],
+  ['Tailgating possible at dock door during deliveries', 'Physical security', 'Additional camera + interlock proposal with client security team.'],
+  ['Water treatment records incomplete for audit', 'Compliance', 'Vendor contract amended to include digital log submission.'],
+  ['Night shift single-person coverage', 'Staffing', 'Lone-worker device issued; recruitment for additional tech approved.'],
+  ['Leak detection absent under CRAH condensate lines', 'Water / leak', 'Extend leak-detection loop; included in minor works plan.'],
+]
+
+export function risksFor(site: Site): Risk[] {
+  const rng = mulberry32(hashSeed(site.id + ':risks'))
+  const n = randInt(rng, 4, 8)
+  const picked = new Set<number>()
+  return Array.from({ length: n }, (_, i) => {
+    let idx = randInt(rng, 0, RISK_TEMPLATES.length - 1)
+    while (picked.has(idx)) idx = (idx + 1) % RISK_TEMPLATES.length
+    picked.add(idx)
+    const [title, category, mitigation] = RISK_TEMPLATES[idx]
+    return {
+      id: `RSK-${hashSeed(site.id + i) % 900 + 100}`,
+      siteId: site.id,
+      title,
+      category,
+      likelihood: randInt(rng, 1, 4),
+      impact: randInt(rng, 2, 5),
+      owner: weighted(rng, [['CBRE', 45], ['Client', 30], ['Shared', 25]] as const),
+      status: weighted(rng, [['Open', 30], ['Mitigating', 40], ['Accepted', 20], ['Closed', 10]] as const),
+      mitigation,
+      raisedDaysAgo: randInt(rng, 5, 400),
+      reviewInDays: randInt(rng, -10, 90),
+    }
+  })
+}
+
+/* ----------------------------- projects ---------------------------- */
+
+const PROJECT_TEMPLATES: [string, Project['type'], Project['category'], string][] = [
+  ['UPS string B battery replacement', 'Capex', 'Lifecycle replacement', 'Batteries at end of design life per asset registry.'],
+  ['CRAH EC-fan retrofit — Hall 1', 'Capex', 'Efficiency', 'Fan energy reduction ~28%; PUE improvement modelled at 0.03.'],
+  ['Hot aisle containment — Hall 2', 'Capex', 'Efficiency', 'Thermal survey shows recirculation at row ends.'],
+  ['Generator control panel upgrade', 'Capex', 'Lifecycle replacement', 'Obsolete controls; vendor support ends this year.'],
+  ['Arc-flash study refresh', 'Opex', 'Compliance', 'Five-year refresh due across switchboards.'],
+  ['Client cage build-out — 40 racks', 'Capex', 'Client fit-out', 'Client expansion committed; power reservation confirmed.'],
+  ['Leak detection extension', 'Opex', 'Resilience', 'Coverage gap under condensate lines per risk register.'],
+  ['BMS controller migration', 'Capex', 'Lifecycle replacement', 'Out-of-support controllers per risk register.'],
+]
+
+export function projectsFor(site: Site): Project[] {
+  const rng = mulberry32(hashSeed(site.id + ':projects'))
+  const n = randInt(rng, 3, 6)
+  return Array.from({ length: n }, (_, i) => {
+    const [name, type, category, rationale] = pick(rng, PROJECT_TEMPLATES)
+    const status = weighted(rng, [
+      ['Proposed', 20], ['Approved', 20], ['In Flight', 35], ['On Hold', 10], ['Complete', 15],
+    ] as const)
+    const budget = (type === 'Capex' ? randInt(rng, 120, 1400) : randInt(rng, 30, 220)) * 1000
+    const completion = status === 'Complete' ? 100 : status === 'In Flight' ? randInt(rng, 15, 85) : status === 'On Hold' ? randInt(rng, 10, 60) : 0
+    return {
+      id: `PRJ-${hashSeed(site.id + i) % 900 + 100}`,
+      siteId: site.id,
+      name,
+      type,
+      category,
+      status,
+      budgetUSD: budget,
+      spentUSD: Math.round(budget * (completion / 100) * randFloat(rng, 0.8, 1.1, 2)),
+      completionPct: completion,
+      targetYear: status === 'Complete' ? 2025 : pick(rng, [2026, 2026, 2027, 2028]),
+      source: rng() < 0.7 ? 'Kahua' : 'MS Project',
+      linkedAsset: category === 'Lifecycle replacement' ? `${pick(rng, ['UPS', 'CH', 'CRAH', 'GEN'])}-${String(randInt(rng, 1, 6)).padStart(2, '0')}` : undefined,
+      rationale,
+    }
+  })
+}
+
+/** Replacement cost model for capital-plan candidates (USD). */
+export const REPLACEMENT_COST: Record<string, number> = {
+  UPS: 420_000, Chiller: 650_000, CRAH: 90_000, CRAC: 80_000,
+  Generator: 780_000, PDU: 65_000, Switchgear: 310_000,
 }
 
 /* --------------------------- integrations -------------------------- */

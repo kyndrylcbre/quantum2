@@ -42,7 +42,9 @@ this pattern; never mutate the static store in `src/data`.
 Chunk 1 (done): shell, Dashboard, Monitoring, Birdseye, Ticketing, Integrations.
 Chunk 2 (done): Capacity Planning, Operations Mgmt, Rounds & Shifts, Incidents, Assets,
 read/write Ticketing + alarm ack + sync-event layer.
-Chunk 3: HSE, Risk Mgmt, Projects (capital planning pulls from assets + tickets + monitoring).
+Chunk 3 (done): HSE, Risk Mgmt, Projects with capital planning derived from asset lifecycle
+flags + maintenance spend (promote-to-project pushes to Kahua). All 13 modules are now built.
+Next: real Emerald token true-up (blocked on Chrome extension), real API/MCP integration layer.
 
 ## Repo
 

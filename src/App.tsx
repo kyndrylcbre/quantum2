@@ -16,6 +16,9 @@ import { Operations } from './pages/Operations'
 import { Rounds } from './pages/Rounds'
 import { Incidents } from './pages/Incidents'
 import { Assets } from './pages/Assets'
+import { HSE } from './pages/HSE'
+import { Risk } from './pages/Risk'
+import { Projects } from './pages/Projects'
 
 const BUILT: Record<string, React.ComponentType> = {
   '/': Dashboard,
@@ -28,6 +31,9 @@ const BUILT: Record<string, React.ComponentType> = {
   '/rounds': Rounds,
   '/incidents': Incidents,
   '/assets': Assets,
+  '/hse': HSE,
+  '/risk': Risk,
+  '/projects': Projects,
 }
 
 export default function App() {

@@ -173,6 +173,67 @@ export interface MaintenanceEntry {
   by: string
 }
 
+/* ----- HSE ----- */
+export type HseKind = 'Observation' | 'Near Miss' | 'Incident'
+export type HseCategory =
+  | 'Electrical safety' | 'Slips / trips / falls' | 'PPE compliance' | 'Housekeeping'
+  | 'Working at height' | 'Manual handling' | 'Chemical / COSHH' | 'Contractor control'
+
+export interface HseEntry {
+  id: string
+  siteId: string
+  kind: HseKind
+  category: HseCategory
+  description: string
+  reportedBy: string
+  daysAgo: number
+  status: 'Open' | 'Closed'
+  recordable: boolean // OSHA-recordable (incidents only)
+  correctiveAction: string
+}
+
+/* ----- risk register ----- */
+export type RiskCategory =
+  | 'Power resilience' | 'Cooling resilience' | 'Fire protection' | 'Water / leak'
+  | 'Physical security' | 'Compliance' | 'Single point of failure' | 'Staffing'
+export type RiskOwner = 'CBRE' | 'Client' | 'Shared'
+export type RiskStatus = 'Open' | 'Mitigating' | 'Accepted' | 'Closed'
+
+export interface Risk {
+  id: string
+  siteId: string
+  title: string
+  category: RiskCategory
+  likelihood: number // 1-5
+  impact: number // 1-5
+  owner: RiskOwner
+  status: RiskStatus
+  mitigation: string
+  raisedDaysAgo: number
+  reviewInDays: number
+}
+
+/* ----- projects & capital planning ----- */
+export type ProjectType = 'Capex' | 'Opex'
+export type ProjectStatus = 'Proposed' | 'Approved' | 'In Flight' | 'On Hold' | 'Complete'
+export type ProjectCategory = 'Lifecycle replacement' | 'Efficiency' | 'Compliance' | 'Client fit-out' | 'Resilience'
+
+export interface Project {
+  id: string
+  siteId: string
+  name: string
+  type: ProjectType
+  category: ProjectCategory
+  status: ProjectStatus
+  budgetUSD: number
+  spentUSD: number
+  completionPct: number
+  targetYear: number
+  source: string // Kahua, MS Project…
+  linkedAsset?: string
+  rationale: string
+}
+
 /* ----- push-pull sync ----- */
 export type SyncStatus = 'pushing' | 'confirmed' | 'failed'
 

@@ -1,16 +1,18 @@
 import { SITES } from './sites'
 import {
-  alarmsFor, equipmentFor, handoversFor, historyFor, incidentsFor, integrations,
-  opsFor, racksFor, roundsFor, ticketsFor,
+  alarmsFor, equipmentFor, handoversFor, historyFor, hseFor, incidentsFor, integrations,
+  opsFor, projectsFor, racksFor, risksFor, roundsFor, ticketsFor,
 } from './generate'
 import type {
-  Alarm, HandoverNote, Incident, Integration, MaintenanceEntry, MechEquipment,
-  OpsProfile, Rack, RoundInstance, Site, Ticket,
+  Alarm, HandoverNote, HseEntry, Incident, Integration, MaintenanceEntry, MechEquipment,
+  OpsProfile, Project, Rack, Risk, RoundInstance, Site, Ticket,
 } from './types'
 
 export * from './types'
 export { SITES, siteById } from './sites'
-export { genSeries, mergedSeries, HOUR_LABELS, DAY_LABELS_14, MONTH_LABELS, TECHS } from './generate'
+export {
+  genSeries, mergedSeries, HOUR_LABELS, DAY_LABELS_14, MONTH_LABELS, TECHS, REPLACEMENT_COST,
+} from './generate'
 
 /* Memoized, deterministic store — generated once per session.
    Mutable entities (tickets, incidents, alarms, rounds, handovers) are seeded
@@ -25,6 +27,9 @@ const store = (() => {
   const handovers = new Map<string, HandoverNote[]>()
   const ops = new Map<string, OpsProfile>()
   const history = new Map<string, MaintenanceEntry[]>()
+  const hse = new Map<string, HseEntry[]>()
+  const risks = new Map<string, Risk[]>()
+  const projects = new Map<string, Project[]>()
   for (const s of SITES) {
     racks.set(s.id, racksFor(s))
     equipment.set(s.id, equipmentFor(s))
@@ -34,9 +39,12 @@ const store = (() => {
     rounds.set(s.id, roundsFor(s))
     handovers.set(s.id, handoversFor(s))
     ops.set(s.id, opsFor(s))
+    hse.set(s.id, hseFor(s))
+    risks.set(s.id, risksFor(s))
+    projects.set(s.id, projectsFor(s))
     for (const e of equipment.get(s.id)!) history.set(e.id, historyFor(e))
   }
-  return { racks, equipment, alarms, tickets, incidents, rounds, handovers, ops, history, integrations: integrations() }
+  return { racks, equipment, alarms, tickets, incidents, rounds, handovers, ops, history, hse, risks, projects, integrations: integrations() }
 })()
 
 /** siteId of 'all' means every site. */
@@ -59,6 +67,9 @@ export const seedTickets = (): Ticket[] => SITES.flatMap(s => store.tickets.get(
 export const seedIncidents = (): Incident[] => SITES.flatMap(s => store.incidents.get(s.id)!)
 export const seedRounds = (): RoundInstance[] => SITES.flatMap(s => store.rounds.get(s.id)!)
 export const seedHandovers = (): HandoverNote[] => SITES.flatMap(s => store.handovers.get(s.id)!)
+export const seedHse = (): HseEntry[] => SITES.flatMap(s => store.hse.get(s.id)!)
+export const seedRisks = (): Risk[] => SITES.flatMap(s => store.risks.get(s.id)!)
+export const seedProjects = (): Project[] => SITES.flatMap(s => store.projects.get(s.id)!)
 
 /* legacy read accessors kept for pages that only display (scoped from context now for mutable sets) */
 export const getAlarms = (siteId: string): Alarm[] => forScope(store.alarms, siteId)

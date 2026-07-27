@@ -37,9 +37,9 @@ Dev server: http://localhost:5180
 | Rounds & Shifts | 2 | ✅ Built — rounds checklists with reading capture, shift handover publish/acknowledge |
 | Incidents | 2 | ✅ Built — SEV1–4 board, severity-based notification matrix, editable in-tool RCA |
 | Assets | 2 | ✅ Built — registry with condition/age, lifecycle flags, maintenance history |
-| HSE | 3 | Stub — observations and incidents |
-| Risk Mgmt | 3 | Stub — risk register with party ownership |
-| Projects | 3 | Stub — opex/capex + capital planning fed by assets/tickets/monitoring |
+| HSE | 3 | ✅ Built — log/close observations, near misses, incidents; recordables tracking |
+| Risk Mgmt | 3 | ✅ Built — living register, 5×5 heat matrix, CBRE/Client/Shared ownership, review cadence |
+| Projects | 3 | ✅ Built — Kahua-synced opex/capex delivery + capital candidates auto-derived from asset lifecycle flags, promote-to-project |
 
 ### Push-pull, not read-only
 
