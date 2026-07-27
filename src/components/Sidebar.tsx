@@ -1,23 +1,16 @@
 import { NavLink } from 'react-router-dom'
 import { MODULES } from '../modules'
-
-function LogoMark() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 32 32" fill="none" aria-hidden>
-      <path d="M16 4l10.4 6v12L16 28 5.6 22V10L16 4z" stroke="currentColor" strokeWidth="2.4" />
-      <circle cx="16" cy="16" r="3.4" fill="currentColor" />
-    </svg>
-  )
-}
+import { CbreLogo } from '../emerald'
 
 export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="logo"><LogoMark /></div>
+        <CbreLogo className="brand-cbre" />
+        <div className="brand-divider" />
         <div className="word">
           <div className="name">Quantum</div>
-          <div className="tag">CBRE Data Center Ops</div>
+          <div className="tag">Data Center Ops</div>
         </div>
       </div>
 

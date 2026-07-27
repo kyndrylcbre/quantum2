@@ -48,6 +48,20 @@ npm config set //us.artifactory.gcso.cbre.com/artifactory/api/npm/devx-npm-nonpr
 
 Support: EmeraldEngineering@cbre.com
 
+## Recreated component library (`src/emerald/`)
+
+Since the licensed packages are unavailable, these are recreated from scratch to match the
+Emerald Storybook, named to mirror the real `@emerald-react/*` API:
+
+Button, IconButton, Chip, StatusTag, TextField, Select, Textarea, Checkbox, Tabs,
+SegmentedControl, Tooltip, Card, **Avatar, NotificationBadge, Accordion, InlineNotification,
+Radio/RadioGroup, Switch, ProgressBar, Spinner, Breadcrumb, Divider, EmptyState**, plus
+`CbreLogo` (official CBRE wordmark SVG sourced from cbre.com — single-color, inherits
+currentColor so it reverses on the green nav).
+
+The CBRE logo sits in the sidebar brand lockup (wordmark + divider + product name), matching
+Emerald's App Header pattern. The top-bar bell uses NotificationBadge; the user chip uses Avatar.
+
 ## Deviation log
 
 - Emerald has no "serious" semantic step; ours maps to `@orange800/@orange400`.

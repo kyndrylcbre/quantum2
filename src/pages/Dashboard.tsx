@@ -11,11 +11,14 @@ import {
 } from '../data'
 import { Badge, Card, ChartTip, sevTone, StatTile } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend, REGION_COLOR } from '../components/charts'
+import { EmeraldNotification } from '../emerald'
+import { useNavigate } from 'react-router-dom'
 
 const REGIONS: Region[] = ['Americas', 'EMEA', 'APAC']
 
 export function Dashboard() {
   const { siteId } = useApp()
+  const navigate = useNavigate()
   const sites = getSites(siteId)
   const scopeLabel = siteId === 'all'
     ? 'Global portfolio — 10 sites'
@@ -232,10 +235,17 @@ export function Dashboard() {
       </Card>
 
       {hotRacks > 0 && (
-        <p className="muted" style={{ marginTop: 'var(--gap-md)', fontSize: 'var(--text-sm)' }}>
-          {criticalAlarms} unacknowledged critical alarm{criticalAlarms === 1 ? '' : 's'} and {hotRacks} rack
-          {hotRacks === 1 ? '' : 's'} above thermal threshold in scope — see <Link to="/monitoring">Monitoring</Link> and <Link to="/birdseye">Birdseye</Link>.
-        </p>
+        <div style={{ marginTop: 'var(--gap-md)' }}>
+          <EmeraldNotification
+            status="warning"
+            title="Attention needed"
+            actionLabel="Open Monitoring"
+            onAction={() => navigate('/monitoring')}
+          >
+            {criticalAlarms} unacknowledged critical alarm{criticalAlarms === 1 ? '' : 's'} and {hotRacks} rack
+            {hotRacks === 1 ? '' : 's'} above thermal threshold in scope — review Monitoring and Birdseye.
+          </EmeraldNotification>
+        </div>
       )}
     </div>
   )

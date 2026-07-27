@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { scoped, useData } from '../context/DataContext'
 import { SITES } from '../data'
 import { IconBell, IconMoon, IconSun } from './Icons'
+import { EmeraldAvatar, EmeraldBadge, EmeraldIconButton } from '../emerald'
 
 export function TopBar() {
   const { siteId, setSiteId, theme, toggleTheme } = useApp()
@@ -30,25 +31,23 @@ export function TopBar() {
       </div>
 
       <div className="right row">
-        <button
-          className="icon-btn"
-          title={`${unacked} unacknowledged alarms`}
-          aria-label={`${unacked} unacknowledged alarms — open Monitoring`}
-          onClick={() => navigate('/monitoring')}
-        >
-          <IconBell />
-          {unacked > 0 && <span className="count">{unacked}</span>}
-        </button>
-        <button
-          className="icon-btn"
+        <EmeraldBadge count={unacked}>
+          <EmeraldIconButton
+            label={`${unacked} unacknowledged alarms — open Monitoring`}
+            onClick={() => navigate('/monitoring')}
+          >
+            <IconBell />
+          </EmeraldIconButton>
+        </EmeraldBadge>
+        <EmeraldIconButton
+          label="Toggle color theme"
           onClick={toggleTheme}
           title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-          aria-label="Toggle color theme"
         >
           {theme === 'light' ? <IconMoon /> : <IconSun />}
-        </button>
+        </EmeraldIconButton>
         <div className="row" style={{ gap: 10 }}>
-          <div className="avatar">BH</div>
+          <EmeraldAvatar initials="BH" alt="Brad Hauser" />
           <div className="user-meta">
             <div className="n">Brad Hauser</div>
             <div className="r">Global Ops Admin</div>

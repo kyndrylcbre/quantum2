@@ -10,33 +10,34 @@
 .sidebar .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px 16px 14px;
+  gap: 11px;
+  padding: 18px 16px 16px;
 }
-.sidebar .brand .logo {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: rgba(23, 232, 143, 0.12);
-  border: 1px solid rgba(23, 232, 143, 0.4);
-  display: grid;
-  place-items: center;
-  color: var(--nav-accent);
+.sidebar .brand .brand-cbre {
+  height: 22px;
+  width: auto;
+  color: #fff; /* CBRE wordmark reversed on green nav */
+  flex: none;
+}
+.sidebar .brand .brand-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.28);
   flex: none;
 }
 .sidebar .brand .word {
-  line-height: 1.15;
+  line-height: 1.12;
 }
 .sidebar .brand .word .name {
   font-family: var(--font-display);
   font-size: 1.18rem;
   color: #fff;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 .sidebar .brand .word .tag {
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.13em;
   color: var(--nav-ink);
 }
 

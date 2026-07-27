@@ -241,6 +241,152 @@ select.em-field__control { appearance: none; padding-right: 34px; cursor: pointe
 .em-tooltip:hover .em-tooltip__bubble,
 .em-tooltip:focus-within .em-tooltip__bubble { opacity: 1; }
 
+/* ---------------- Avatar ---------------- */
+.em-avatar {
+  display: inline-grid; place-items: center; flex: none;
+  border-radius: 50%;
+  background: var(--brand); color: var(--on-brand);
+  font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+  overflow: hidden;
+}
+.em-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.em-avatar--sm { width: 28px; height: 28px; font-size: 11px; }
+.em-avatar--md { width: 36px; height: 36px; font-size: var(--text-xs); }
+.em-avatar--lg { width: 48px; height: 48px; font-size: var(--text-md); }
+
+/* ---------------- Notification badge (dot / number) ---------------- */
+.em-badge-wrap { position: relative; display: inline-flex; }
+.em-badge-count {
+  position: absolute; top: -5px; right: -6px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--status-critical); color: #fff;
+  font-size: 0.62rem; font-weight: 700; line-height: 16px; text-align: center;
+  border: 2px solid var(--surface); box-sizing: content-box;
+}
+.em-badge-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--status-critical); border: 2px solid var(--surface);
+}
+
+/* ---------------- Accordion ---------------- */
+.em-accordion { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; background: var(--surface); }
+.em-accordion__item + .em-accordion__item { border-top: 1px solid var(--border); }
+.em-accordion__header {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border: none; background: transparent;
+  font-family: var(--font-body); font-size: var(--text-md); font-weight: 500;
+  color: var(--ink); cursor: pointer; text-align: left;
+}
+.em-accordion__header:hover { background: var(--surface-2); }
+.em-accordion__chevron { margin-left: auto; color: var(--ink-3); transition: transform 0.15s ease; flex: none; }
+.em-accordion__item--open .em-accordion__chevron { transform: rotate(90deg); }
+.em-accordion__panel { padding: 0 16px 16px; color: var(--ink-2); font-size: var(--text-sm); line-height: 1.55; }
+
+/* ---------------- Inline notification ---------------- */
+.em-note {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: var(--radius-sm);
+  border-left: 4px solid var(--status-info);
+  background: var(--status-info-soft);
+}
+.em-note--success { border-left-color: var(--status-good); background: var(--status-good-soft); }
+.em-note--warning { border-left-color: var(--status-warn); background: var(--status-warn-soft); }
+.em-note--error { border-left-color: var(--status-critical); background: var(--status-critical-soft); }
+.em-note--info { border-left-color: var(--status-info); background: var(--status-info-soft); }
+.em-note__icon { flex: none; margin-top: 1px; }
+.em-note--success .em-note__icon { color: var(--status-good); }
+.em-note--warning .em-note__icon { color: var(--status-warn); }
+.em-note--error .em-note__icon { color: var(--status-critical); }
+.em-note--info .em-note__icon { color: var(--status-info); }
+.em-note__body { flex: 1; min-width: 0; }
+.em-note__title { font-weight: 600; color: var(--ink); font-size: var(--text-sm); }
+.em-note__msg { color: var(--ink-2); font-size: var(--text-sm); margin-top: 2px; line-height: 1.45; }
+.em-note__action {
+  border: none; background: transparent; color: var(--accent);
+  font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600; cursor: pointer; flex: none;
+}
+.em-note__close {
+  border: none; background: transparent; color: var(--ink-3); cursor: pointer;
+  display: inline-grid; place-items: center; flex: none; padding: 2px;
+}
+.em-note__close:hover { color: var(--ink); }
+
+/* ---------------- Radio ---------------- */
+.em-radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: var(--text-sm); color: var(--ink); }
+.em-radio input { position: absolute; opacity: 0; width: 0; height: 0; }
+.em-radio__dot {
+  width: 18px; height: 18px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--border-strong); background: var(--surface);
+  display: grid; place-items: center; transition: border-color 0.1s ease;
+}
+.em-radio__dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); transform: scale(0); transition: transform 0.1s ease; }
+.em-radio input:checked ~ .em-radio__dot { border-color: var(--brand); }
+.em-radio input:checked ~ .em-radio__dot::after { transform: scale(1); }
+.em-radio input:focus-visible ~ .em-radio__dot { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.em-radio--disabled { opacity: 0.4; cursor: not-allowed; }
+.em-radiogroup { display: flex; flex-direction: column; gap: 10px; }
+.em-radiogroup--row { flex-direction: row; gap: 20px; }
+
+/* ---------------- Switch ---------------- */
+.em-switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: var(--text-sm); color: var(--ink); }
+.em-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.em-switch__track {
+  width: 40px; height: 22px; flex: none; border-radius: var(--radius-pill);
+  background: var(--border-strong); position: relative; transition: background 0.15s ease;
+}
+.em-switch__track::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  transition: transform 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.em-switch input:checked ~ .em-switch__track { background: var(--brand); }
+.em-switch input:checked ~ .em-switch__track::after { transform: translateX(18px); }
+.em-switch input:focus-visible ~ .em-switch__track { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.em-switch--disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------------- Progress bar ---------------- */
+.em-progress { height: 8px; border-radius: var(--radius-pill); background: var(--surface-3); overflow: hidden; }
+.em-progress__fill { height: 100%; border-radius: var(--radius-pill); background: var(--brand); transition: width 0.3s ease; }
+:root[data-theme="dark"] .em-progress__fill { background: var(--accent); }
+
+/* ---------------- Spinner ---------------- */
+.em-spinner {
+  display: inline-block; border-radius: 50%; flex: none;
+  border: 2.5px solid var(--border); border-top-color: var(--brand);
+  animation: em-spin 0.7s linear infinite;
+}
+:root[data-theme="dark"] .em-spinner { border-top-color: var(--accent); }
+.em-spinner--sm { width: 16px; height: 16px; }
+.em-spinner--md { width: 24px; height: 24px; border-width: 3px; }
+.em-spinner--lg { width: 40px; height: 40px; border-width: 4px; }
+
+/* ---------------- Breadcrumb ---------------- */
+.em-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); flex-wrap: wrap; }
+.em-breadcrumb a, .em-breadcrumb span { color: var(--ink-3); text-decoration: none; }
+.em-breadcrumb a:hover { color: var(--ink); }
+.em-breadcrumb__sep { color: var(--ink-3); opacity: 0.6; }
+.em-breadcrumb__current { color: var(--ink); font-weight: 500; }
+
+/* ---------------- Divider ---------------- */
+.em-divider { border: none; border-top: 1px solid var(--border); margin: var(--gap-md) 0; }
+.em-divider--vertical { border-top: none; border-left: 1px solid var(--border); margin: 0 var(--gap-md); align-self: stretch; }
+
+/* ---------------- Empty state ---------------- */
+.em-empty { text-align: center; padding: var(--gap-xl); color: var(--ink-3); }
+.em-empty__icon { color: var(--border-strong); margin-bottom: 10px; display: inline-flex; }
+.em-empty__title { font-size: var(--text-md); font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
+.em-empty__msg { font-size: var(--text-sm); }
+
+/* ---------------- App header brand lockup ---------------- */
+.em-brandlock { display: flex; align-items: center; gap: 12px; }
+.em-brandlock__logo { height: 22px; width: auto; color: var(--nav-ink-active); flex: none; }
+.em-brandlock__divider { width: 1px; height: 22px; background: rgba(255,255,255,0.28); flex: none; }
+.em-brandlock__product { line-height: 1.1; }
+.em-brandlock__product .name { font-family: var(--font-display); font-size: 1.15rem; color: #fff; letter-spacing: 0.01em; }
+.em-brandlock__product .tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--nav-ink); display: block; }
+
 /* ---------------- Card ---------------- */
 .em-card {
   background: var(--surface);
