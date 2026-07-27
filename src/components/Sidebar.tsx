@@ -7,10 +7,7 @@ export function Sidebar() {
     <aside className="sidebar">
       <div className="brand">
         <CbreLogo className="brand-cbre" />
-        <div className="brand-divider" />
-        <div className="word">
-          <div className="name">Quantum</div>
-        </div>
+        <div className="name">Quantum</div>
       </div>
 
       <div className="nav-label">Modules</div>
