@@ -5,8 +5,8 @@
    the licensed package is mostly an import change.
    ============================================================ */
 import {
-  forwardRef, useId, useState, type ButtonHTMLAttributes, type InputHTMLAttributes,
-  type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes,
+  forwardRef, useEffect, useId, useRef, useState, type ButtonHTMLAttributes,
+  type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes,
 } from 'react'
 import './emerald.css'
 export { CbreLogo } from './CbreLogo'
@@ -158,6 +158,62 @@ export const EmeraldSelect = forwardRef<HTMLSelectElement, SelectProps>(function
     </div>
   )
 })
+
+/* ---------------- Dropdown (custom select with Emerald popup) ---------------- */
+export function EmeraldDropdown<T extends string>({ label, value, options, onChange, placeholder, block, className }: {
+  label?: string
+  value: T | ''
+  options: readonly { value: T; label: string }[]
+  onChange: (v: T) => void
+  placeholder?: string
+  block?: boolean
+  className?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const autoId = useId()
+
+  useEffect(() => {
+    if (!open) return
+    const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey) }
+  }, [open])
+
+  const selected = options.find(o => o.value === value)
+  const floated = Boolean(selected) || open
+
+  return (
+    <div ref={ref} className={cx('em-field', 'em-dd', open && 'em-dd--open', floated && 'em-field--floated', block && 'em-field--block', className)}>
+      <button type="button" id={autoId} className="em-dd__trigger" aria-haspopup="listbox" aria-expanded={open}
+        onClick={() => setOpen(o => !o)}>
+        <span className={cx('em-dd__value', !selected && 'em-dd__value--placeholder')}>
+          {selected?.label ?? placeholder ?? 'Select…'}
+        </span>
+      </button>
+      {label && <label className="em-field__label" htmlFor={autoId}>{label}</label>}
+      <span className="em-field__chevron" aria-hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" /></svg>
+      </span>
+      {open && (
+        <ul className="em-dd__menu" role="listbox">
+          {options.map(o => (
+            <li key={o.value} role="option" aria-selected={o.value === value}
+              className={cx('em-dd__opt', o.value === value && 'em-dd__opt--sel')}
+              onClick={() => { onChange(o.value); setOpen(false) }}>
+              <span>{o.label}</span>
+              {o.value === value && (
+                <svg className="em-dd__check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5L20 6" /></svg>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 /* ---------------- Textarea ---------------- */
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {

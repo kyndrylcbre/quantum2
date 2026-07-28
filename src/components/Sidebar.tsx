@@ -2,7 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { MODULES } from '../modules'
 import { useApp } from '../context/AppContext'
 import { SITES } from '../data'
-import { EmeraldSelect } from '../emerald'
+import { EmeraldDropdown } from '../emerald'
+
+const SITE_OPTIONS = [
+  { value: 'all', label: `All sites — global (${SITES.length})` },
+  ...SITES.map(s => ({ value: s.id, label: `${s.code} · ${s.city}` })),
+]
 
 export function Sidebar() {
   const { siteId, setSiteId } = useApp()
@@ -10,17 +15,13 @@ export function Sidebar() {
   return (
     <aside className="sidebar sidebar--nav">
       <div className="side-site">
-        <EmeraldSelect
+        <EmeraldDropdown
           label="Site"
           block
           value={siteId}
-          onChange={e => setSiteId(e.target.value)}
-        >
-          <option value="all">All sites — global ({SITES.length})</option>
-          {SITES.map(s => (
-            <option key={s.id} value={s.id}>{s.code} · {s.city}</option>
-          ))}
-        </EmeraldSelect>
+          options={SITE_OPTIONS}
+          onChange={setSiteId}
+        />
       </div>
 
       <div className="nav-label">Modules</div>

@@ -179,6 +179,67 @@ select.em-field__control { appearance: none; padding-right: 34px; cursor: pointe
   text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
 }
 
+/* ---------------- Dropdown (custom select, Emerald-styled popup) ---------------- */
+.em-dd { position: relative; }
+.em-dd__trigger {
+  width: 100%;
+  height: 40px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--text-md);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.em-dd__trigger:hover { border-color: var(--ink-2); }
+.em-dd--open .em-dd__trigger,
+.em-dd__trigger:focus-visible {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 1px var(--focus-ring);
+}
+.em-dd__value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.em-dd__value--placeholder { color: var(--ink-3); }
+.em-dd .em-field__chevron { transition: transform 0.15s ease; }
+.em-dd--open .em-field__chevron { transform: translateY(-50%) rotate(180deg); }
+
+.em-dd__menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+}
+.em-dd__opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  cursor: pointer;
+}
+.em-dd__opt:hover { background: var(--surface-2); }
+.em-dd__opt--sel { color: var(--brand); font-weight: 600; background: var(--accent-soft); }
+:root[data-theme="dark"] .em-dd__opt--sel { color: var(--ink); }
+.em-dd__check { margin-left: auto; flex: none; }
+
 /* ---------------- Checkbox ---------------- */
 .em-checkbox { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: var(--text-sm); color: var(--ink); }
 .em-checkbox input { position: absolute; opacity: 0; width: 0; height: 0; }

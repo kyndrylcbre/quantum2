@@ -167,9 +167,21 @@
   background: var(--nav-bg);
   border-bottom: 1px solid var(--border);
 }
-.app-header__brand { display: flex; align-items: center; gap: 10px; flex: none; }
-.app-header__logo { height: 16px; width: auto; color: #fff; display: block; flex: none; }
-.app-header__divider { width: 1px; height: 20px; background: rgba(255,255,255,0.28); flex: none; }
+.app-header__brand { display: flex; align-items: baseline; gap: 11px; flex: none; }
+.app-header__logo {
+  height: 15px; /* cap height ~matches the product wordmark, baseline-aligned */
+  width: auto;
+  color: #fff;
+  flex: none;
+  align-self: baseline;
+}
+.app-header__divider {
+  width: 1px;
+  height: 17px;
+  background: rgba(255,255,255,0.28);
+  flex: none;
+  align-self: center;
+}
 .app-header__product {
   font-family: var(--font-body);
   font-size: 1.25rem;
