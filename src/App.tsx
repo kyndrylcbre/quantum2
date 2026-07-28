@@ -1,8 +1,7 @@
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import { AppProvider, useApp } from './context/AppContext'
+import { AppProvider } from './context/AppContext'
 import { DataProvider } from './context/DataContext'
 import { Sidebar } from './components/Sidebar'
-import { TopBar } from './components/TopBar'
 import { AppHeader } from './components/AppHeader'
 import { SyncTray } from './components/SyncTray'
 import { MODULES } from './modules'
@@ -57,38 +56,18 @@ function Routed() {
   )
 }
 
-function Shell() {
-  const { layout } = useApp()
-
-  if (layout === 'appheader') {
-    return (
-      <div className="app-shell-h">
-        <AppHeader />
-        <div className="app-body">
-          <Sidebar variant="nav" />
-          <Routed />
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="app-shell">
-      <Sidebar />
-      <div className="app-main">
-        <TopBar />
-        <Routed />
-      </div>
-    </div>
-  )
-}
-
 export default function App() {
   return (
     <AppProvider>
       <DataProvider>
         <HashRouter>
-          <Shell />
+          <div className="app-shell-h">
+            <AppHeader />
+            <div className="app-body">
+              <Sidebar />
+              <Routed />
+            </div>
+          </div>
           <SyncTray />
         </HashRouter>
       </DataProvider>
