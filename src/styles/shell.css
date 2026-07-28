@@ -102,8 +102,40 @@
 }
 .sidebar .side-footer strong { color: #fff; font-weight: 600; }
 
-/* ---------- nav-only sidebar (App Header layout) ---------- */
-.sidebar--nav .nav-label { padding-top: 16px; }
+/* ---------- nav-only sidebar (App Header layout): light Emerald side-nav ---------- */
+.sidebar--nav {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+.sidebar--nav .nav-label {
+  padding: 16px 18px 6px;
+  color: var(--ink-3);
+  opacity: 1;
+}
+.sidebar--nav .side-link {
+  color: var(--ink-2);
+}
+.sidebar--nav .side-link:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.sidebar--nav .side-link.active {
+  color: var(--brand);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+:root[data-theme="dark"] .sidebar--nav .side-link.active { color: var(--ink); }
+.sidebar--nav .side-link.active::before {
+  background: var(--accent);
+}
+.sidebar--nav .side-link .chunk-pill {
+  color: var(--ink-3);
+}
+.sidebar--nav .side-footer {
+  border-top-color: var(--border);
+  color: var(--ink-3);
+}
+.sidebar--nav .side-footer strong { color: var(--ink-2); }
 
 /* ---------- App Header layout ---------- */
 .app-shell-h {

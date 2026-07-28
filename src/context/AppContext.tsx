@@ -17,7 +17,7 @@ const Ctx = createContext<AppState | null>(null)
 export function AppProvider({ children }: { children: ReactNode }) {
   const [siteId, setSiteId] = useState<string>(() => localStorage.getItem('qtm.site') ?? 'all')
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('qtm.theme') as Theme) ?? 'light')
-  const [layout, setLayout] = useState<Layout>(() => (localStorage.getItem('qtm.layout') as Layout) ?? 'sidebar')
+  const [layout, setLayout] = useState<Layout>(() => (localStorage.getItem('qtm.layout') as Layout) ?? 'appheader')
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)

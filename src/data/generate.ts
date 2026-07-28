@@ -20,7 +20,8 @@ export function racksFor(site: Site): Rack[] {
   const perHall = Math.ceil(site.rackCount / site.halls)
   for (let h = 1; h <= site.halls; h++) {
     const inHall = Math.min(perHall, site.rackCount - racks.length)
-    const rows = Math.min(ROWS.length, Math.ceil(inHall / 12))
+    // squarer, denser block: ~sqrt aspect rather than 2 long rows
+    const rows = Math.min(ROWS.length, Math.max(2, Math.round(Math.sqrt(inHall / 2))))
     for (let i = 0; i < inHall; i++) {
       const row = ROWS[i % rows]
       const slot = Math.floor(i / rows) + 1

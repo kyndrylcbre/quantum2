@@ -27,9 +27,10 @@ const STATUS_FILL: Record<Rack['status'], string> = {
   offline: 'var(--status-neutral)',
 }
 
-const RACK_W = 30
-const RACK_H = 20
-const GAP = 5
+const RACK_W = 20
+const RACK_H = 14
+const GAP = 3
+const AISLE = 8 // extra gap between cold/hot aisle pairs
 
 export function Birdseye() {
   const { siteId, setSiteId } = useApp()
@@ -77,28 +78,33 @@ function FloorView({ siteId }: { siteId: string }) {
   const power = equipment.filter(e => e.kind === 'UPS' || e.kind === 'PDU' || e.kind === 'Switchgear')
   const plant = equipment.filter(e => e.kind === 'Chiller' || e.kind === 'Generator')
 
-  /* ---- adaptive geometry: strips wrap and the canvas grows to fit ---- */
-  const SIDE_W = 74 // left grayspace strip (UPS/PDU/SWG)
-  const originX = SIDE_W + 44
-  const floorW = Math.max(originX + maxSlot * (RACK_W + GAP) + 24, originX + 380)
+  /* ---- compact geometry: tight rack grid, 2-col power wall, wrapped strips ---- */
+  const PW = 54, PH = 22, PGAP = 6 // power unit size
+  const POWER_COLS = 2
+  const SIDE_W = POWER_COLS * PW + (POWER_COLS - 1) * PGAP + 20 // left power wall width
+  const originX = SIDE_W + 34
 
-  const COOL_W = 52
-  const coolCols = Math.max(1, Math.floor((floorW - originX - 16) / (COOL_W + 8)))
+  const floorW = Math.max(originX + maxSlot * (RACK_W + GAP) + 16, 360)
+
+  // cooling is a full-width top strip
+  const COOL_W = 46
+  const coolCols = Math.max(1, Math.floor((floorW - 24) / (COOL_W + 6)))
   const coolRows = Math.max(1, Math.ceil(cracs.length / coolCols))
-  const PLANT_H = 30 + coolRows * 38 // top grayspace strip (CRAH/CRAC along wall)
+  const PLANT_H = 26 + coolRows * 32 // top cooling strip height
 
-  const originY = PLANT_H + 46
-  // extra aisle gap after every 2 rows (cold/hot aisle pairs)
-  const rowY = (ri: number) => originY + ri * (RACK_H + GAP) + Math.floor(ri / 2) * 14
+  const originY = PLANT_H + 34
+  const rowY = (ri: number) => originY + ri * (RACK_H + GAP) + Math.floor(ri / 2) * AISLE
 
-  const PLANT_UNIT_W = 56
-  const plantCols = Math.max(1, Math.floor((floorW - originX - 16) / (PLANT_UNIT_W + 8)))
+  const PLANT_UNIT_W = 52
+  const plantCols = Math.max(1, Math.floor((floorW - 24) / (PLANT_UNIT_W + 6)))
   const plantRowsN = Math.max(1, Math.ceil(plant.length / plantCols))
 
-  const powerBottom = PLANT_H + 42 + power.length * 38 + 14
-  const rackBottom = rowY(rows.length) + 8
-  const plantY = Math.max(powerBottom, rackBottom) + 24
-  const floorH = plantY + plantRowsN * 30 + 14
+  const powerRowsN = Math.max(1, Math.ceil(power.length / POWER_COLS))
+  const powerBottom = PLANT_H + 38 + powerRowsN * (PH + PGAP)
+  const rackBottom = rowY(rows.length) + 6
+  const plantTop = Math.max(powerBottom, rackBottom) + 16 // zone-box top
+  const plantY = plantTop + 22 // first unit row
+  const floorH = plantY + plantRowsN * 28 + 10
 
   const rackFill = (r: Rack): string => {
     if (overlay === 'status') return STATUS_FILL[r.status]
@@ -158,33 +164,34 @@ function FloorView({ siteId }: { siteId: string }) {
           <svg className="floor-svg" viewBox={`0 0 ${floorW} ${floorH}`} role="img"
             aria-label={`Floor plan of hall ${hall}`}>
 
-            {/* grayspace: cooling wall (top) */}
-            <rect x={originX - 10} y={12} width={floorW - originX - 8} height={PLANT_H - 4} className="zone-box" rx={6} />
-            <text x={originX} y={26} className="zone-label">Cooling — CRAH / CRAC</text>
+            {/* grayspace: cooling wall (full-width top strip) */}
+            <rect x={8} y={10} width={floorW - 16} height={PLANT_H - 2} className="zone-box" rx={6} />
+            <text x={16} y={23} className="zone-label">Cooling — CRAH / CRAC</text>
             {cracs.map((e, i) => {
-              const x = originX + (i % coolCols) * (COOL_W + 8)
-              const y = 34 + Math.floor(i / coolCols) * 38
+              const x = 16 + (i % coolCols) * (COOL_W + 6)
+              const y = 28 + Math.floor(i / coolCols) * 32
               return (
                 <g key={e.id} onClick={() => setSel({ kind: 'equip', equip: e })}>
-                  <rect x={x} y={y} width={COOL_W} height={30} rx={4}
+                  <rect x={x} y={y} width={COOL_W} height={26} rx={4}
                     className={`equip${sel?.kind === 'equip' && sel.equip.id === e.id ? ' selected' : ''}`}
                     fill={`var(--status-${e.status === 'online' ? 'good' : e.status === 'warning' ? 'warn' : e.status === 'fault' ? 'critical' : 'info'}-soft)`} />
-                  <text x={x + COOL_W / 2} y={y + 18} textAnchor="middle" className="equip-label">{e.name}</text>
+                  <text x={x + COOL_W / 2} y={y + 16} textAnchor="middle" className="equip-label">{e.name}</text>
                 </g>
               )
             })}
 
-            {/* grayspace: power wall (left) */}
-            <rect x={10} y={PLANT_H + 16} width={SIDE_W} height={power.length * 38 + 36} className="zone-box" rx={6} />
-            <text x={16} y={PLANT_H + 32} className="zone-label">Power</text>
+            {/* grayspace: power wall (left, 2 columns) */}
+            <rect x={8} y={PLANT_H + 14} width={SIDE_W} height={powerRowsN * (PH + PGAP) + 26} className="zone-box" rx={6} />
+            <text x={14} y={PLANT_H + 28} className="zone-label">Power</text>
             {power.map((e, i) => {
-              const y = PLANT_H + 42 + i * 38
+              const x = 16 + (i % POWER_COLS) * (PW + PGAP)
+              const y = PLANT_H + 36 + Math.floor(i / POWER_COLS) * (PH + PGAP)
               return (
                 <g key={e.id} onClick={() => setSel({ kind: 'equip', equip: e })}>
-                  <rect x={18} y={y} width={SIDE_W - 16} height={30} rx={4}
+                  <rect x={x} y={y} width={PW} height={PH} rx={4}
                     className={`equip${sel?.kind === 'equip' && sel.equip.id === e.id ? ' selected' : ''}`}
                     fill={`var(--status-${e.status === 'online' ? 'good' : e.status === 'warning' ? 'warn' : e.status === 'fault' ? 'critical' : 'info'}-soft)`} />
-                  <text x={18 + (SIDE_W - 16) / 2} y={y + 18} textAnchor="middle" className="equip-label">{e.name}</text>
+                  <text x={x + PW / 2} y={y + PH / 2 + 4} textAnchor="middle" className="equip-label">{e.name}</text>
                 </g>
               )
             })}
@@ -211,11 +218,12 @@ function FloorView({ siteId }: { siteId: string }) {
               </g>
             ))}
 
-            {/* grayspace: external plant (bottom) */}
-            <text x={originX} y={plantY - 8} className="zone-label">External plant</text>
+            {/* grayspace: external plant (full-width bottom strip) */}
+            <rect x={8} y={plantTop} width={floorW - 16} height={floorH - plantTop - 4} className="zone-box" rx={6} />
+            <text x={16} y={plantTop + 14} className="zone-label">External plant</text>
             {plant.map((e, i) => {
-              const x = originX + (i % plantCols) * (PLANT_UNIT_W + 8)
-              const y = plantY + Math.floor(i / plantCols) * 30
+              const x = 16 + (i % plantCols) * (PLANT_UNIT_W + 6)
+              const y = plantY + Math.floor(i / plantCols) * 28
               return (
                 <g key={e.id} onClick={() => setSel({ kind: 'equip', equip: e })}>
                   <rect x={x} y={y} width={PLANT_UNIT_W} height={22} rx={4}
