@@ -31,7 +31,8 @@ export function Sidebar() {
             key={m.path}
             to={m.path}
             end={m.path === '/'}
-            className={({ isActive }) => `side-link${isActive ? ' active' : ''}`}
+            className={({ isActive }) =>
+              `side-link${isActive ? ' active' : ''}${m.path === '/integrations' ? ' side-link--spotlight' : ''}`}
           >
             <m.icon />
             <span>{m.name}</span>

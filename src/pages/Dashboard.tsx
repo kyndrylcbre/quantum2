@@ -243,7 +243,7 @@ export function Dashboard() {
             onAction={() => navigate('/monitoring')}
           >
             {criticalAlarms} unacknowledged critical alarm{criticalAlarms === 1 ? '' : 's'} and {hotRacks} rack
-            {hotRacks === 1 ? '' : 's'} above thermal threshold in scope — review Monitoring and Birdseye.
+            {hotRacks === 1 ? '' : 's'} above thermal threshold in scope — review Monitoring and Site View.
           </EmeraldNotification>
         </div>
       )}

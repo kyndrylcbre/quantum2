@@ -39,7 +39,7 @@ export function Birdseye() {
     return (
       <div>
         <div className="page-header">
-          <h1>Birdseye</h1>
+          <h1>Site View</h1>
           <p className="subtitle">Select a facility to open its raised-floor view.</p>
         </div>
         <div className="site-pick-grid">
@@ -135,7 +135,7 @@ function FloorView({ siteId }: { siteId: string }) {
   return (
     <div>
       <div className="page-header">
-        <h1>Birdseye</h1>
+        <h1>Site View</h1>
         <p className="subtitle">
           {site.code} · {site.name} — raised floor and major mechanical plant · layout source: {site.dcim}
         </p>

@@ -20,7 +20,7 @@ export const MODULES: ModuleDef[] = [
   { path: '/monitoring', name: 'Monitoring', icon: IconMonitor, chunk: 1, built: true,
     blurb: 'BMS/BAS sensor telemetry across whitespace and grayspace with a live alarm feed.',
     integrates: ['Siemens Desigo CC', 'Schneider EcoStruxure', 'Honeywell EBI', 'Nlyte', 'Sunbird'] },
-  { path: '/birdseye', name: 'Birdseye', icon: IconBirdseye, chunk: 1, built: true,
+  { path: '/birdseye', name: 'Site View', icon: IconBirdseye, chunk: 1, built: true,
     blurb: 'Interactive 2D raised-floor view — racks plus major mechanical plant.',
     integrates: ['Nlyte', 'Sunbird dcTrack'] },
   { path: '/capacity', name: 'Capacity Planning', icon: IconCapacity, chunk: 2, built: true,

@@ -137,6 +137,27 @@
 }
 .sidebar--nav .side-footer strong { color: var(--ink-2); }
 
+/* ---------- demo spotlight: subtle pulse on the Integrations nav item ---------- */
+@keyframes side-spotlight {
+  0%, 100% {
+    background: transparent;
+    box-shadow: 0 0 0 0 rgba(23, 232, 143, 0);
+  }
+  50% {
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent) inset, 0 0 10px -2px var(--accent);
+  }
+}
+.side-link--spotlight:not(.active) {
+  animation: side-spotlight 2.2s ease-in-out infinite;
+}
+.side-link--spotlight:not(.active):hover {
+  animation: none; /* let hover take over cleanly */
+}
+@media (prefers-reduced-motion: reduce) {
+  .side-link--spotlight:not(.active) { animation: none; background: var(--accent-soft); }
+}
+
 /* ---------- App Header layout ---------- */
 .app-shell-h {
   display: flex;
