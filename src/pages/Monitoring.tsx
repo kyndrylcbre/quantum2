@@ -10,7 +10,7 @@ import {
 } from '../data'
 import { alarmTone, Badge, Card, ChartTip, equipTone, Segmented, StatTile } from '../components/ui'
 import { axisTick, ChartFrame } from '../components/charts'
-import { EmeraldButton } from '../emerald'
+import { EmeraldButton, EmeraldDropdown } from '../emerald'
 
 const SEV_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -163,10 +163,11 @@ export function Monitoring() {
 
         <Card title={`Equipment status (${visibleEquip.length})`}
           action={
-            <select className="select" value={kindFilter} onChange={e => setKindFilter(e.target.value as 'all' | EquipKind)}>
-              <option value="all">All types</option>
-              {KIND_ORDER.map(k => <option key={k} value={k}>{k}</option>)}
-            </select>
+            <EmeraldDropdown
+              value={kindFilter}
+              onChange={setKindFilter}
+              options={[{ value: 'all', label: 'All types' }, ...KIND_ORDER.map(k => ({ value: k, label: k }))]}
+            />
           }
         >
           <div className="table-scroll" style={{ maxHeight: 420, overflowY: 'auto' }}>

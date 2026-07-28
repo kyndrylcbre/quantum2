@@ -7,7 +7,7 @@ import {
 } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, priorityTone, Segmented, StatTile, ticketTone } from '../components/ui'
-import { EmeraldButton, EmeraldSelect, EmeraldTextField } from '../emerald'
+import { EmeraldButton, EmeraldDropdown, EmeraldTextField } from '../emerald'
 
 const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
@@ -72,19 +72,27 @@ export function Ticketing() {
 
       <div className="filter-row">
         <Segmented options={STATUS_OPTIONS} value={statusView} onChange={setStatusView} />
-        <select className="select" value={typeFilter} onChange={e => setTypeFilter(e.target.value as 'all' | TicketType)}>
-          <option value="all">All types</option>
-          <option>Preventative</option>
-          <option>Reactive</option>
-          <option>Hands & Eyes</option>
-          <option>Project Support</option>
-        </select>
-        <select className="select" value={spaceFilter} onChange={e => setSpaceFilter(e.target.value as 'all' | TicketSpace)}>
-          <option value="all">Whitespace + M&E + Facility</option>
-          <option>Whitespace</option>
-          <option>M&E</option>
-          <option>Facility</option>
-        </select>
+        <EmeraldDropdown
+          value={typeFilter}
+          onChange={setTypeFilter}
+          options={[
+            { value: 'all', label: 'All types' },
+            { value: 'Preventative', label: 'Preventative' },
+            { value: 'Reactive', label: 'Reactive' },
+            { value: 'Hands & Eyes', label: 'Hands & Eyes' },
+            { value: 'Project Support', label: 'Project Support' },
+          ]}
+        />
+        <EmeraldDropdown
+          value={spaceFilter}
+          onChange={setSpaceFilter}
+          options={[
+            { value: 'all', label: 'Whitespace + M&E + Facility' },
+            { value: 'Whitespace', label: 'Whitespace' },
+            { value: 'M&E', label: 'M&E' },
+            { value: 'Facility', label: 'Facility' },
+          ]}
+        />
         <div className="spacer" />
         <span className="muted" style={{ fontSize: 'var(--text-sm)' }}>{visible.length} shown</span>
       </div>
@@ -198,14 +206,13 @@ function TicketDetail({ ticket, allSites, onUpdate }: {
       </dl>
 
       <div style={{ marginTop: 14 }}>
-        <EmeraldSelect
+        <EmeraldDropdown
           label={`Assignee — pushes to ${ticket.source}`}
           block
           value={ticket.assignee}
-          onChange={e => onUpdate({ assignee: e.target.value }, `Reassign to ${e.target.value} —`)}
-        >
-          {TECHS.map(t => <option key={t}>{t}</option>)}
-        </EmeraldSelect>
+          options={TECHS.map(t => ({ value: t, label: t }))}
+          onChange={v => onUpdate({ assignee: v }, `Reassign to ${v} —`)}
+        />
       </div>
     </Card>
   )
@@ -251,28 +258,31 @@ function NewTicketModal({ defaultSite, onClose }: { defaultSite: string; onClose
             <EmeraldTextField label="Title" block autoFocus value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           </div>
-          <EmeraldSelect label="Site" block value={form.siteId}
-            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-            {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
-          </EmeraldSelect>
-          <EmeraldSelect label="Type" block value={form.type}
-            onChange={e => setForm(f => ({ ...f, type: e.target.value as TicketType }))}>
-            <option>Reactive</option><option>Preventative</option>
-            <option>Hands & Eyes</option><option>Project Support</option>
-          </EmeraldSelect>
-          <EmeraldSelect label="Space" block value={form.space}
-            onChange={e => setForm(f => ({ ...f, space: e.target.value as TicketSpace }))}>
-            <option>Whitespace</option><option>M&E</option><option>Facility</option>
-          </EmeraldSelect>
-          <EmeraldSelect label="Priority" block value={form.priority}
-            onChange={e => setForm(f => ({ ...f, priority: e.target.value as TicketPriority }))}>
-            <option>P1</option><option>P2</option><option>P3</option><option>P4</option>
-          </EmeraldSelect>
+          <EmeraldDropdown label="Site" block value={form.siteId}
+            options={SITES.map(s => ({ value: s.id, label: `${s.code} · ${s.name}` }))}
+            onChange={v => setForm(f => ({ ...f, siteId: v }))} />
+          <EmeraldDropdown label="Type" block value={form.type}
+            options={[
+              { value: 'Reactive', label: 'Reactive' },
+              { value: 'Preventative', label: 'Preventative' },
+              { value: 'Hands & Eyes', label: 'Hands & Eyes' },
+              { value: 'Project Support', label: 'Project Support' },
+            ]}
+            onChange={v => setForm(f => ({ ...f, type: v as TicketType }))} />
+          <EmeraldDropdown label="Space" block value={form.space}
+            options={[
+              { value: 'Whitespace', label: 'Whitespace' },
+              { value: 'M&E', label: 'M&E' },
+              { value: 'Facility', label: 'Facility' },
+            ]}
+            onChange={v => setForm(f => ({ ...f, space: v as TicketSpace }))} />
+          <EmeraldDropdown label="Priority" block value={form.priority}
+            options={['P1', 'P2', 'P3', 'P4'].map(p => ({ value: p, label: p }))}
+            onChange={v => setForm(f => ({ ...f, priority: v as TicketPriority }))} />
           <div className="full">
-            <EmeraldSelect label="Assignee" block value={form.assignee}
-              onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))}>
-              {TECHS.map(t => <option key={t}>{t}</option>)}
-            </EmeraldSelect>
+            <EmeraldDropdown label="Assignee" block value={form.assignee}
+              options={TECHS.map(t => ({ value: t, label: t }))}
+              onChange={v => setForm(f => ({ ...f, assignee: v }))} />
           </div>
         </div>
         <p className="muted" style={{ marginTop: 14, fontSize: 'var(--text-xs)' }}>

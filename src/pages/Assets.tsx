@@ -6,7 +6,7 @@ import {
   type EquipKind, type MechEquipment,
 } from '../data'
 import { Badge, Card, equipTone, StatTile } from '../components/ui'
-import { EmeraldButton } from '../emerald'
+import { EmeraldButton, EmeraldDropdown } from '../emerald'
 
 const KINDS: EquipKind[] = ['UPS', 'Generator', 'Switchgear', 'PDU', 'Chiller', 'CRAH', 'CRAC']
 const THIS_YEAR = 2026
@@ -64,14 +64,19 @@ export function Assets() {
       </div>
 
       <div className="filter-row">
-        <select className="select" value={kindFilter} onChange={e => setKindFilter(e.target.value as 'all' | EquipKind)}>
-          <option value="all">All types</option>
-          {KINDS.map(k => <option key={k}>{k}</option>)}
-        </select>
-        <select className="select" value={condFilter} onChange={e => setCondFilter(e.target.value as 'all' | 'poor')}>
-          <option value="all">Any condition</option>
-          <option value="poor">Condition ≤ 2 (replacement candidates)</option>
-        </select>
+        <EmeraldDropdown
+          value={kindFilter}
+          onChange={setKindFilter}
+          options={[{ value: 'all', label: 'All types' }, ...KINDS.map(k => ({ value: k, label: k }))]}
+        />
+        <EmeraldDropdown
+          value={condFilter}
+          onChange={setCondFilter}
+          options={[
+            { value: 'all', label: 'Any condition' },
+            { value: 'poor', label: 'Condition ≤ 2 (replacement candidates)' },
+          ]}
+        />
         <div className="spacer" />
         <span className="muted" style={{ fontSize: 'var(--text-sm)' }}>{visible.length} shown</span>
       </div>

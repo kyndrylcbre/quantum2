@@ -180,7 +180,9 @@ select.em-field__control { appearance: none; padding-right: 34px; cursor: pointe
 }
 
 /* ---------------- Dropdown (custom select, Emerald-styled popup) ---------------- */
-.em-dd { position: relative; }
+.em-dd { position: relative; display: inline-block; }
+.em-dd.em-field--block { display: block; }
+.em-dd:not(.em-field--block) .em-dd__trigger { width: auto; }
 .em-dd__trigger {
   width: 100%;
   height: 40px;
@@ -213,8 +215,10 @@ select.em-field__control { appearance: none; padding-right: 34px; cursor: pointe
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  right: 0;
   z-index: 60;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(340px, 80vw);
   list-style: none;
   margin: 0;
   padding: 4px;

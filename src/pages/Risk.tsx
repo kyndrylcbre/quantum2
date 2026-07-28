@@ -4,7 +4,7 @@ import { scoped, useData } from '../context/DataContext'
 import { SITES, siteById, type Risk, type RiskCategory, type RiskOwner, type RiskStatus } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, StatTile, type BadgeTone } from '../components/ui'
-import { EmeraldButton, EmeraldSelect, EmeraldTextField, EmeraldTextarea } from '../emerald'
+import { EmeraldButton, EmeraldDropdown, EmeraldTextField, EmeraldTextarea } from '../emerald'
 
 const CATEGORIES: RiskCategory[] = [
   'Power resilience', 'Cooling resilience', 'Fire protection', 'Water / leak',
@@ -255,27 +255,22 @@ function NewRiskModal({ defaultSite, onClose }: { defaultSite: string; onClose: 
             <EmeraldTextField label="Risk description" block autoFocus value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
           </div>
-          <EmeraldSelect label="Site" block value={form.siteId}
-            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-            {SITES.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
-          </EmeraldSelect>
-          <EmeraldSelect label="Category" block value={form.category}
-            onChange={e => setForm(f => ({ ...f, category: e.target.value as RiskCategory }))}>
-            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-          </EmeraldSelect>
-          <EmeraldSelect label="Likelihood (1–5)" block value={form.likelihood}
-            onChange={e => setForm(f => ({ ...f, likelihood: Number(e.target.value) }))}>
-            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-          </EmeraldSelect>
-          <EmeraldSelect label="Impact (1–5)" block value={form.impact}
-            onChange={e => setForm(f => ({ ...f, impact: Number(e.target.value) }))}>
-            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-          </EmeraldSelect>
+          <EmeraldDropdown label="Site" block value={form.siteId}
+            options={SITES.map(s => ({ value: s.id, label: s.code }))}
+            onChange={v => setForm(f => ({ ...f, siteId: v }))} />
+          <EmeraldDropdown label="Category" block value={form.category}
+            options={CATEGORIES.map(c => ({ value: c, label: c }))}
+            onChange={v => setForm(f => ({ ...f, category: v as RiskCategory }))} />
+          <EmeraldDropdown label="Likelihood (1–5)" block value={String(form.likelihood)}
+            options={[1, 2, 3, 4, 5].map(n => ({ value: String(n), label: String(n) }))}
+            onChange={v => setForm(f => ({ ...f, likelihood: Number(v) }))} />
+          <EmeraldDropdown label="Impact (1–5)" block value={String(form.impact)}
+            options={[1, 2, 3, 4, 5].map(n => ({ value: String(n), label: String(n) }))}
+            onChange={v => setForm(f => ({ ...f, impact: Number(v) }))} />
           <div className="full">
-            <EmeraldSelect label="Risk owner" block value={form.owner}
-              onChange={e => setForm(f => ({ ...f, owner: e.target.value as RiskOwner }))}>
-              <option>CBRE</option><option>Client</option><option>Shared</option>
-            </EmeraldSelect>
+            <EmeraldDropdown label="Risk owner" block value={form.owner}
+              options={['CBRE', 'Client', 'Shared'].map(o => ({ value: o, label: o }))}
+              onChange={v => setForm(f => ({ ...f, owner: v as RiskOwner }))} />
           </div>
           <div className="full">
             <EmeraldTextarea label="Mitigation plan" block value={form.mitigation}

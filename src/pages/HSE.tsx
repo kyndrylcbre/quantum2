@@ -4,7 +4,7 @@ import { scoped, useData } from '../context/DataContext'
 import { SITES, siteById, type HseCategory, type HseEntry, type HseKind } from '../data'
 import { Modal } from '../components/Modal'
 import { Badge, Card, Segmented, StatTile, type BadgeTone } from '../components/ui'
-import { EmeraldButton, EmeraldCheckbox, EmeraldSelect, EmeraldTextarea } from '../emerald'
+import { EmeraldButton, EmeraldCheckbox, EmeraldDropdown, EmeraldTextarea } from '../emerald'
 
 const KIND_TONE: Record<HseKind, BadgeTone> = {
   Observation: 'info', 'Near Miss': 'warn', Incident: 'critical',
@@ -163,19 +163,16 @@ function NewHseModal({ defaultSite, onClose }: { defaultSite: string; onClose: (
     <Modal title="Log HSE entry" onClose={onClose}>
       <form onSubmit={submit}>
         <div className="form-grid">
-          <EmeraldSelect label="Site" block value={form.siteId}
-            onChange={e => setForm(f => ({ ...f, siteId: e.target.value }))}>
-            {SITES.map(s => <option key={s.id} value={s.id}>{s.code} · {s.name}</option>)}
-          </EmeraldSelect>
-          <EmeraldSelect label="Type" block value={form.kind}
-            onChange={e => setForm(f => ({ ...f, kind: e.target.value as HseKind }))}>
-            <option>Observation</option><option>Near Miss</option><option>Incident</option>
-          </EmeraldSelect>
+          <EmeraldDropdown label="Site" block value={form.siteId}
+            options={SITES.map(s => ({ value: s.id, label: `${s.code} · ${s.name}` }))}
+            onChange={v => setForm(f => ({ ...f, siteId: v }))} />
+          <EmeraldDropdown label="Type" block value={form.kind}
+            options={['Observation', 'Near Miss', 'Incident'].map(k => ({ value: k, label: k }))}
+            onChange={v => setForm(f => ({ ...f, kind: v as HseKind }))} />
           <div className="full">
-            <EmeraldSelect label="Category" block value={form.category}
-              onChange={e => setForm(f => ({ ...f, category: e.target.value as HseCategory }))}>
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </EmeraldSelect>
+            <EmeraldDropdown label="Category" block value={form.category}
+              options={CATEGORIES.map(c => ({ value: c, label: c }))}
+              onChange={v => setForm(f => ({ ...f, category: v as HseCategory }))} />
           </div>
           <div className="full">
             <EmeraldTextarea label="What happened / what was observed" block autoFocus value={form.description}
