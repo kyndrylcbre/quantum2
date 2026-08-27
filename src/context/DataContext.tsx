@@ -68,7 +68,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const createTicket = useCallback<DataState['createTicket']>(input => {
     const id = `TKT-${nextTicket.current++}`
-    const source = siteById(input.siteId)?.cmms ?? 'SI7 (CBRE)'
+    const source = siteById(input.siteId)?.cmms ?? 'ServiceNow FSM'
     setTickets(ts => [{ ...input, id, source, createdDaysAgo: 0, slaBreached: false }, ...ts])
     sync(source, 'push', `Create WO ${id}`)
     return id
@@ -139,13 +139,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addProject = useCallback<DataState['addProject']>(input => {
     const id = `PRJ-${nextEntity.current++}`
-    setProjects(ps => [{ ...input, id, spentUSD: 0, completionPct: 0, source: 'Kahua' }, ...ps])
-    sync('Kahua (Projects)', 'push', `Create project ${id}`)
+    setProjects(ps => [{ ...input, id, spentUSD: 0, completionPct: 0, source: 'Autodesk Construction Cloud' }, ...ps])
+    sync('Autodesk Construction Cloud', 'push', `Create project ${id}`)
   }, [sync])
 
   const updateProject = useCallback<DataState['updateProject']>((id, patch, action) => {
     setProjects(ps => ps.map(p => (p.id === id ? { ...p, ...patch } : p)))
-    sync('Kahua (Projects)', 'push', `${action} ${id}`)
+    sync('Autodesk Construction Cloud', 'push', `${action} ${id}`)
   }, [sync])
 
   const value = useMemo<DataState>(() => ({

@@ -6,7 +6,7 @@ export const SITES: Site[] = [
     id: 'ash1', code: 'QTM-ASH1', name: 'Ashvale Campus', city: 'Ashburn, VA', country: 'United States',
     region: 'Americas', tier: 'IV', capacityMW: 24, itLoadMW: 16.2, whitespaceSqft: 92000, halls: 3,
     rackCount: 72, designPUE: 1.32, currentPUE: 1.28, dcim: 'Nlyte', bms: 'Schneider EcoStruxure',
-    cmms: 'SI7 (CBRE)', fte: 34, monthlyOpexUSD: 1480000,
+    cmms: 'ServiceNow FSM', fte: 34, monthlyOpexUSD: 1480000,
   },
   {
     id: 'phx1', code: 'QTM-PHX1', name: 'Sonoran Ridge', city: 'Phoenix, AZ', country: 'United States',
@@ -30,7 +30,7 @@ export const SITES: Site[] = [
     id: 'lon1', code: 'QTM-LON1', name: 'Thamesgate', city: 'Slough', country: 'United Kingdom',
     region: 'EMEA', tier: 'IV', capacityMW: 18, itLoadMW: 13.6, whitespaceSqft: 71000, halls: 3,
     rackCount: 66, designPUE: 1.28, currentPUE: 1.24, dcim: 'Nlyte', bms: 'Siemens Desigo CC',
-    cmms: 'SI7 (CBRE)', fte: 28, monthlyOpexUSD: 1210000,
+    cmms: 'ServiceNow FSM', fte: 28, monthlyOpexUSD: 1210000,
   },
   {
     id: 'fra1', code: 'QTM-FRA1', name: 'Main Digital Park', city: 'Frankfurt', country: 'Germany',
@@ -48,7 +48,7 @@ export const SITES: Site[] = [
     id: 'sin1', code: 'QTM-SIN1', name: 'Straits Junction', city: 'Singapore', country: 'Singapore',
     region: 'APAC', tier: 'IV', capacityMW: 16, itLoadMW: 12.4, whitespaceSqft: 62000, halls: 2,
     rackCount: 64, designPUE: 1.38, currentPUE: 1.42, dcim: 'Nlyte', bms: 'Honeywell EBI',
-    cmms: 'SI7 (CBRE)', fte: 26, monthlyOpexUSD: 1120000,
+    cmms: 'ServiceNow FSM', fte: 26, monthlyOpexUSD: 1120000,
   },
   {
     id: 'tok1', code: 'QTM-TOK1', name: 'Tama Heights', city: 'Tokyo', country: 'Japan',

@@ -88,7 +88,7 @@ export function Projects() {
       <div className="page-header">
         <h1>Projects</h1>
         <p className="subtitle">
-          Opex/capex delivery synced with Kahua — plus capital planning generated from assets, maintenance history, and monitoring.
+          Opex/capex delivery synced with Autodesk Construction Cloud — plus capital planning generated from assets, maintenance history, and monitoring.
         </p>
       </div>
 
@@ -147,7 +147,7 @@ export function Projects() {
                     linkedAsset: c.asset.name,
                     rationale: c.reason,
                   })}>
-                  Promote to project → Kahua
+                  Promote to project → Autodesk
                 </EmeraldButton>
               </div>
             ))}
@@ -220,7 +220,7 @@ function ProjectDetail({ project, onUpdate }: {
     return (
       <Card title="Project detail">
         <div className="empty-note" style={{ padding: 'var(--gap-lg)' }}>
-          Select a project — approvals and status changes push back to Kahua.
+          Select a project — approvals and status changes push back to Autodesk Construction Cloud.
         </div>
       </Card>
     )

@@ -118,7 +118,7 @@ export function Monitoring() {
         </Card>
       </div>
 
-      <div className="grid cols-2">
+      <div className="grid">
         <Card title={`Alarm feed (${visibleAlarms.length})`}
           action={
             <Segmented options={SEV_OPTIONS} value={sevFilter} onChange={v => setSevFilter(v)} />
