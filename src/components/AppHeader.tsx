@@ -1,15 +1,11 @@
-import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { scoped, useData } from '../context/DataContext'
-import { IconBell, IconMoon, IconSun } from './Icons'
-import { CbreLogo, EmeraldAvatar, EmeraldBadge, EmeraldIconButton } from '../emerald'
+import { IconMoon, IconSun } from './Icons'
+import { CbreLogo, EmeraldAvatar, EmeraldIconButton } from '../emerald'
+import { NotificationsMenu } from './NotificationsMenu'
 
 /** Emerald-canonical full-width App Header: brand lockup + global actions. */
 export function AppHeader() {
-  const { siteId, theme, toggleTheme } = useApp()
-  const { alarms } = useData()
-  const navigate = useNavigate()
-  const unacked = scoped(alarms, siteId).filter(a => !a.acked && a.severity !== 'info').length
+  const { theme, toggleTheme } = useApp()
 
   return (
     <header className="app-header">
@@ -20,15 +16,7 @@ export function AppHeader() {
       </div>
 
       <div className="app-header__actions">
-        <EmeraldBadge count={unacked}>
-          <EmeraldIconButton
-            className="on-dark"
-            label={`${unacked} unacknowledged alarms — open Monitoring`}
-            onClick={() => navigate('/monitoring')}
-          >
-            <IconBell />
-          </EmeraldIconButton>
-        </EmeraldBadge>
+        <NotificationsMenu />
         <EmeraldIconButton
           className="on-dark"
           label="Toggle color theme"

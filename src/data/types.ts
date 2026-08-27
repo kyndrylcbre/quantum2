@@ -253,6 +253,7 @@ export interface Integration {
   name: string
   vendor: string
   category: 'DCIM' | 'BMS/BAS' | 'CMMS' | 'ITSM' | 'Project Mgmt' | 'Finance' | 'HR'
+    | 'Observability' | 'Security' | 'Collaboration'
   protocol: 'REST API' | 'MCP' | 'BACnet Gateway' | 'Webhook' | 'SFTP'
   scope: string // "All sites" or site codes
   internal: boolean // CBRE-internal vs client/external
