@@ -130,6 +130,7 @@
 .agent-log--receipt .agent-step__mark { width: 16px; height: 16px; font-size: 10px; margin-top: 2px; }
 
 /* detail panel columns balance like cards */
+.exec-detail--fill { align-items: stretch; }
 .exec-detail--fill > div { display: flex; flex-direction: column; min-width: 0; }
 .cost-basis dt { font-size: var(--text-xs); }
 .cost-basis dd { font-size: var(--text-sm); }
