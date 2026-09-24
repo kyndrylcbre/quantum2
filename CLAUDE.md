@@ -48,7 +48,11 @@ first, score pill) opening a **client dashboard** (`/executive/:clientId`,
 `src/pages/ClientDashboard.tsx`). The summary is the holistic organization view: commercial and
 operational KPI rows, an attention feed, margin/fee chart, account scorecards (a responsive card
 grid — no wide tables on exec pages), a service coverage matrix and regional footprint. Exec pages
-are wrapped in `.exec-page`, whose responsive rules live at the bottom of `executive.css`. The client dashboard covers health, weighted risk,
+are wrapped in `.exec-page`, whose responsive rules live at the bottom of `executive.css`. Cards
+that share a grid row must not leave dead space when a neighbour is taller: give the card
+`fill-col`, let a growing block (chart in `.chart-fill`, or `.bullets` rows) absorb the height, and
+wrap the last section in `.push-bottom`. Prefer bullet/bar rows over fixed-height Recharts panels
+on these pages. The client dashboard covers health, weighted risk,
 incidents/outages, margin, contract & services, drivers and top risks, spend, IT-load trend by
 site, the planner's capital outlook, and the sites under contract with systems of record. Clients
 come from `src/data/clients.ts`; scoring lives in `src/data/clientHealth.ts` (pure functions over

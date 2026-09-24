@@ -259,3 +259,26 @@
 .bullet-key { display: inline-flex; align-items: center; gap: 6px; }
 .bullet-key__bar { width: 14px; height: 8px; border-radius: 2px; background: var(--chart-1); }
 .bullet-key__tick { width: 3px; height: 12px; border-radius: 1px; background: var(--ink); }
+
+
+/* ---------- fill-height cards: content grows, last block pins to the bottom ---------- */
+.fill-col { display: flex; flex-direction: column; }
+.push-bottom { margin-top: auto; padding-top: 14px; }
+.chart-fill { flex: 1; min-height: 200px; }
+.owner-grid--4 { grid-template-columns: repeat(4, 1fr); }
+.owner-cell--hot .owner-n { color: var(--status-critical); }
+
+/* contract term timeline */
+.term { margin-bottom: 6px; }
+.term__track { position: relative; height: 10px; border-radius: 5px; background: var(--surface-3); }
+.term__fill { height: 100%; border-radius: 5px; background: var(--chart-2); }
+.term__notice { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--status-warn); }
+.term__labels { position: relative; display: flex; justify-content: space-between; margin-top: 4px; font-size: var(--text-xs); color: var(--ink-3); font-variant-numeric: tabular-nums; height: 16px; }
+.term__now { position: absolute; top: 0; transform: translateX(-50%); color: var(--ink-2); font-weight: 600; }
+
+/* compact bullet rows (risk by category) */
+.bullets--compact { flex: none; min-height: 0; gap: 6px; justify-content: flex-start; }
+.bullet--compact { min-height: 20px; grid-template-columns: minmax(96px, 1.4fr) 2fr minmax(56px, auto); gap: 10px; }
+.bullet--compact .bullet__track { height: 8px; }
+.bullet--compact .bullet__name { font-weight: 500; font-size: var(--text-xs); }
+.bullet--compact .bullet__value { font-size: var(--text-xs); }

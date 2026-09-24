@@ -236,24 +236,31 @@ export function ExecutiveSummary() {
           </div>
         </Card>
 
-        <Card title="Footprint by region">
-          <table className="data-table">
-            <thead><tr><th>Region</th><th className="num">Sites</th><th className="num">IT load</th><th className="num">Accounts</th></tr></thead>
-            <tbody>
-              {regionRows.map(r => (
-                <tr key={r.region}>
-                  <td><strong>{r.region}</strong></td>
-                  <td className="num">{r.sites}</td>
-                  <td className="num">{r.mw.toFixed(1)} MW</td>
-                  <td className="num">{r.clients}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="exec-sub" style={{ marginTop: 10 }}>
-            {snapshots.filter(s => !s.onboarded).length > 0
-              ? `${snapshots.filter(s => !s.onboarded).length} account(s) not yet connected to Quantum — shown from onboarding snapshots.`
-              : 'Every account’s footprint is connected to Quantum — all metrics are live from site systems of record.'}
+        <Card title="Footprint by region" className="fill-col">
+          <div className="bullets" role="list">
+            {regionRows.map(r => (
+              <div key={r.region} className="bullet" role="listitem">
+                <div className="bullet__label">
+                  <span className="bullet__name">{r.region}</span>
+                  <span className="bullet__meta">{r.sites} site{r.sites === 1 ? '' : 's'} · {r.clients} account{r.clients === 1 ? '' : 's'}</span>
+                </div>
+                <div className="bullet__track" aria-hidden>
+                  <div className="bullet__fill" style={{ width: `${(r.mw / itLoad) * 100}%` }} />
+                </div>
+                <div className="bullet__value">
+                  <span className="exec-num">{r.mw.toFixed(1)} MW</span>
+                  <span className="muted">{Math.round((r.mw / itLoad) * 100)}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bullet-foot">
+            <span className="bullet-key"><span className="bullet-key__bar" /> share of {itLoad.toFixed(0)} MW IT load</span>
+            <span className="right">
+              {snapshots.filter(s => !s.onboarded).length > 0
+                ? `${snapshots.filter(s => !s.onboarded).length} account(s) not yet on Quantum`
+                : 'All accounts live on Quantum'}
+            </span>
           </div>
         </Card>
       </div>
