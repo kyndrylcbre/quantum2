@@ -121,3 +121,15 @@
 }
 .ask-q { align-self: flex-end; background: var(--accent-soft); color: var(--ink); border-bottom-right-radius: 4px; font-weight: 500; }
 .ask-a { align-self: flex-start; background: var(--surface-2); color: var(--ink); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+
+/* step log header + collapsed receipt after the run */
+.agent-log__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; font-size: var(--text-xs); color: var(--ink-3); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.agent-log__head + .agent-log { margin-top: 4px; }
+.agent-log--receipt .agent-step { padding: 4px 0; }
+.agent-log--receipt .agent-step + .agent-step::before { top: -5px; height: 9px; }
+.agent-log--receipt .agent-step__mark { width: 16px; height: 16px; font-size: 10px; margin-top: 2px; }
+
+/* detail panel columns balance like cards */
+.exec-detail--fill > div { display: flex; flex-direction: column; min-width: 0; }
+.cost-basis dt { font-size: var(--text-xs); }
+.cost-basis dd { font-size: var(--text-sm); }

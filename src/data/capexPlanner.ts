@@ -279,10 +279,19 @@ function chooseIntervention(urgency: number, ageRatio: number, priority: CapexPr
   return 'Monitor'
 }
 
+/** Cost basis for one asset at its site: like-for-like replacement (tier IV carries a 12% uplift),
+    refurbishment at 35%, enhanced-PM life extension at 8% per year. */
+export function costBasisFor(asset: MechEquipment, site: Site): { list: number; tierUplift: number; replace: number; refurbish: number; extend: number } {
+  const list = REPLACEMENT_COST[asset.kind] ?? 100_000
+  const tierUplift = site.tier === 'IV' ? 0.12 : 0
+  const replace = list * (1 + tierUplift)
+  const k = (n: number) => Math.round(n / 1000) * 1000
+  return { list, tierUplift, replace: k(replace), refurbish: k(replace * 0.35), extend: k(replace * 0.08) }
+}
+
 function costFor(asset: MechEquipment, site: Site, intervention: CapexIntervention): number {
-  const base = (REPLACEMENT_COST[asset.kind] ?? 100_000) * (site.tier === 'IV' ? 1.12 : 1)
-  const factor = intervention === 'Replace' ? 1 : intervention === 'Refurbish' ? 0.35 : intervention === 'Extend life' ? 0.08 : 0
-  return Math.round(base * factor / 1000) * 1000
+  const b = costBasisFor(asset, site)
+  return intervention === 'Replace' ? b.replace : intervention === 'Refurbish' ? b.refurbish : intervention === 'Extend life' ? b.extend : 0
 }
 
 function naturalYearFor(urgency: number, critical: boolean, params: CapexPlanParams): number {

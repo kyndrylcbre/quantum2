@@ -6,12 +6,12 @@ import {
 import { useApp } from '../context/AppContext'
 import { scoped, useData } from '../context/DataContext'
 import {
-  answerFollowUp, buildPlan, defaultParams, FOLLOW_UPS, fmtUSD, getEquipment, getHistory, getRacks,
-  getSites, interpretPrompt, THIS_YEAR,
+  answerFollowUp, buildPlan, costBasisFor, defaultParams, FOLLOW_UPS, fmtUSD, getEquipment, getHistory,
+  getRacks, getSites, interpretPrompt, THIS_YEAR,
   type CapexIntervention, type CapexPlan, type FollowUp, type PlanStep, type Recommendation,
 } from '../data'
 import { alarmTone, Badge, Card, ChartTip, equipTone, Segmented, StatTile, type BadgeTone } from '../components/ui'
-import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
+import { axisTick, MiniLegend } from '../components/charts'
 import { EmeraldButton, EmeraldChip, EmeraldSpinner, EmeraldSwitch, EmeraldTextarea } from '../emerald'
 import '../styles/capital.css'
 
@@ -65,6 +65,8 @@ export function CapitalPlanning() {
   /* ---- agent console ---- */
   const [prompt, setPrompt] = useState(capexPlan?.prompt ?? '')
   const [running, setRunning] = useState(false)
+  /* full step detail streams while running; afterwards the log collapses to a receipt unless expanded */
+  const [showReasoning, setShowReasoning] = useState(false)
   const [visibleSteps, setVisibleSteps] = useState(capexPlan ? plan.steps.length : 0)
   const timers = useRef<number[]>([])
 
@@ -87,6 +89,7 @@ export function CapitalPlanning() {
     setSelectedId(null)
     setChat([])
     setRunning(true)
+    setShowReasoning(false)
     setVisibleSteps(0)
     const n = plan.steps.length
     for (let i = 0; i < n; i++) {
@@ -195,7 +198,7 @@ export function CapitalPlanning() {
 
       {/* ---- agent console + plan by year ---- */}
       <div className="grid cols-3" style={{ marginBottom: 'var(--gap-md)' }}>
-        <Card className="span-2" title="Planner"
+        <Card className="span-2 fill-col" title="Planner"
           action={<Badge tone={running ? 'warn' : capexPlan ? 'good' : 'neutral'} dot={running}>{running ? 'Planning…' : capexPlan ? 'Plan ready' : 'Baseline'}</Badge>}>
           <form className="agent-console" onSubmit={e => { e.preventDefault(); run(prompt) }}>
             <EmeraldTextarea
@@ -220,38 +223,49 @@ export function CapitalPlanning() {
           </div>
 
           {visibleSteps === 0 && !running && (
-            <div className="agent-baseline">
+            <div className="agent-baseline push-bottom">
               Showing the <strong>baseline plan</strong> — balanced weighting, no budget envelope, current site scope.
               Run a prompt to re-plan; the planner streams each step so you can see where the evidence came from.
             </div>
           )}
 
           {visibleSteps > 0 && (
-            <ol className="agent-log" aria-live="polite">
-              {plan.steps.slice(0, visibleSteps).map((s, i) => {
-                const active = running && i === visibleSteps - 1
-                return (
-                  <li key={s.id} className={`agent-step${active ? ' active' : ' done'}`}>
-                    <span className="agent-step__mark" aria-hidden>{active ? <EmeraldSpinner size="sm" /> : '✓'}</span>
-                    <div className="agent-step__body">
-                      <div className="agent-step__head">
-                        <span className="agent-step__title">{s.title}</span>
-                        <Badge tone={STEP_TONE[s.kind]} dot={false}>{STEP_LABEL[s.kind]}</Badge>
-                        <span className="agent-step__sys">{s.system}</span>
+            <>
+              <div className="agent-log__head">
+                <span>{running ? `Step ${visibleSteps} of ${plan.steps.length}` : `${plan.steps.length} steps · ${plan.steps.filter(x => x.kind === 'pull').length} pulls from site systems`}</span>
+                {planDone && (
+                  <EmeraldButton variant="text" size="sm" onClick={() => setShowReasoning(v => !v)}>
+                    {showReasoning ? 'Hide reasoning' : 'Show reasoning'}
+                  </EmeraldButton>
+                )}
+              </div>
+              <ol className={`agent-log${planDone && !showReasoning ? ' agent-log--receipt' : ''}`} aria-live="polite">
+                {plan.steps.slice(0, visibleSteps).map((s, i) => {
+                  const active = running && i === visibleSteps - 1
+                  const expanded = running || showReasoning
+                  return (
+                    <li key={s.id} className={`agent-step${active ? ' active' : ' done'}`}>
+                      <span className="agent-step__mark" aria-hidden>{active ? <EmeraldSpinner size="sm" /> : '✓'}</span>
+                      <div className="agent-step__body">
+                        <div className="agent-step__head">
+                          <span className="agent-step__title">{s.title}</span>
+                          <Badge tone={STEP_TONE[s.kind]} dot={false}>{STEP_LABEL[s.kind]}</Badge>
+                          <span className="agent-step__sys">{s.system}</span>
+                        </div>
+                        {!active && expanded && <div className="agent-step__detail">{s.detail}</div>}
                       </div>
-                      {!active && <div className="agent-step__detail">{s.detail}</div>}
-                    </div>
-                  </li>
-                )
-              })}
-            </ol>
+                    </li>
+                  )
+                })}
+              </ol>
+            </>
           )}
-          {planDone && visibleSteps > 0 && <div className="agent-narrative">{plan.narrative}</div>}
+          {planDone && visibleSteps > 0 && <div className="agent-narrative push-bottom">{plan.narrative}</div>}
         </Card>
 
-        <Card title="Planned spend by year ($k)">
-          <ChartFrame height={230}>
-            <ResponsiveContainer>
+        <Card title="Planned spend by year ($k)" className="fill-col">
+          <div className="chart-fill">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -6 }}>
                 <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
                 <XAxis dataKey="label" tick={axisTick} tickLine={false} axisLine={{ stroke: 'var(--chart-grid)' }} />
@@ -266,7 +280,7 @@ export function CapitalPlanning() {
                 <Bar dataKey="Extend life" stackId="a" fill="var(--chart-3)" radius={[4, 4, 0, 0]} maxBarSize={40} stroke="var(--surface)" strokeWidth={2} />
               </BarChart>
             </ResponsiveContainer>
-          </ChartFrame>
+          </div>
           <MiniLegend items={[
             { label: 'Replace', color: 'var(--chart-1)' },
             { label: 'Refurbish', color: 'var(--chart-2)' },
@@ -405,6 +419,8 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
   onUndo: () => void
 }) {
   const age = THIS_YEAR - r.asset.installedYear
+  const basis = costBasisFor(r.asset, r.site)
+  const cmSpend = r.history.filter(h => h.type === 'CM').reduce((sum, h) => sum + h.costUSD, 0)
   return (
     <Card
       title={`${r.asset.name} · ${r.asset.kind} · ${r.site.code}${r.client ? ` · ${r.client.name}` : ''}`}
@@ -413,7 +429,7 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
         <Badge tone={urgencyTone(r.urgency)} dot={false}>Urgency {r.urgency}</Badge>
       </div>}
     >
-      <div className="grid cols-3 exec-detail">
+      <div className="grid cols-3 exec-detail exec-detail--fill">
         {/* why */}
         <div>
           <div className="card-title"><span>Why — score breakdown</span></div>
@@ -435,6 +451,14 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
           {r.urgency !== r.baseUrgency && (
             <div className="exec-sub" style={{ marginTop: 8 }}>Base {r.baseUrgency} → {r.urgency} after the <strong>{plan.params.priority}</strong> weighting.</div>
           )}
+          <div className="push-bottom">
+            <div className="card-title"><span>Whitespace telemetry — {r.site.dcim}</span></div>
+            <div className="owner-grid">
+              <div className="owner-cell"><span className="owner-n">{r.hallHotRacks}</span><span className="owner-l">hot racks</span><span className="owner-w">of {r.hallRacks} in H{r.asset.hall}</span></div>
+              <div className="owner-cell"><span className="owner-n">{r.hallLoadPct}%</span><span className="owner-l">hall load</span><span className="owner-w">rack power / capacity</span></div>
+              <div className="owner-cell"><span className="owner-n">{r.asset.loadPct || '—'}</span><span className="owner-l">unit load %</span><span className="owner-w">{r.asset.metric}</span></div>
+            </div>
+          </div>
         </div>
 
         {/* evidence */}
@@ -487,12 +511,6 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
             </>
           )}
 
-          <div className="card-title" style={{ marginTop: 14 }}><span>Whitespace telemetry — {r.site.dcim}</span></div>
-          <div className="owner-grid">
-            <div className="owner-cell"><span className="owner-n">{r.hallHotRacks}</span><span className="owner-l">hot racks</span><span className="owner-w">of {r.hallRacks} in H{r.asset.hall}</span></div>
-            <div className="owner-cell"><span className="owner-n">{r.hallLoadPct}%</span><span className="owner-l">hall load</span><span className="owner-w">rack power / capacity</span></div>
-            <div className="owner-cell"><span className="owner-n">{r.asset.loadPct || '—'}</span><span className="owner-l">unit load %</span><span className="owner-w">{r.asset.metric}</span></div>
-          </div>
         </div>
 
         {/* recommendation + ask */}
@@ -522,6 +540,15 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
             </div>
           )}
 
+          <div className="card-title"><span>Cost basis — {r.site.code}, Tier {r.site.tier}</span></div>
+          <dl className="detail-kv cost-basis">
+            <dt>Like-for-like replacement</dt><dd>{fmtUSD(basis.replace)}{basis.tierUplift > 0 && <span className="muted"> · incl. {Math.round(basis.tierUplift * 100)}% Tier IV uplift</span>}</dd>
+            <dt>Refurbishment</dt><dd>{fmtUSD(basis.refurbish)} <span className="muted">· 35%</span></dd>
+            <dt>Enhanced PM (extend life)</dt><dd>{fmtUSD(basis.extend)} <span className="muted">/ yr</span></dd>
+            <dt>Corrective spend, 24 mo</dt><dd>{fmtUSD(cmSpend)}</dd>
+          </dl>
+
+          <div className="push-bottom">
           <div className="card-title"><span>Ask the planner</span></div>
           <div className="ask-chips">
             {FOLLOW_UPS.map(f => <EmeraldChip key={f.key} onClick={() => onAsk(f.key)}>{f.label}</EmeraldChip>)}
@@ -534,6 +561,7 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
                 <div className="ask-a">{m.a}</div>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </div>
