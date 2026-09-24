@@ -1,15 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
-} from 'recharts'
 import { useData } from '../context/DataContext'
 import {
   buildPlan, CLIENTS, defaultParams, fmtUSD, getEquipment, getHistory, getRacks, HEALTH_WEIGHTS,
   OWNER_WEIGHT, SERVICE_LINES, SITES, snapshotsFor, type ClientSnapshot, type Region,
 } from '../data'
-import { Badge, Card, ChartTip, Segmented, StatTile, type BadgeTone } from '../components/ui'
-import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
+import { Badge, Card, Segmented, StatTile, type BadgeTone } from '../components/ui'
 import { FINANCE_SOURCE, marginTone, pct, ServiceStrip } from '../components/exec'
 import { EmeraldButton } from '../emerald'
 import '../styles/executive.css'
@@ -86,13 +82,6 @@ export function ExecutiveSummary() {
     return out.sort((a, b) => a.rank - b.rank).slice(0, 8)
   }, [snapshots])
 
-  const chartData = useMemo(() => sorted.map(s => ({
-    label: s.client.name.replace(' Technology', ''),
-    Actual: s.commercials.actualMarginPct,
-    Target: s.commercials.targetMarginPct,
-    Fee: Math.round(s.commercials.annualFeeUSD / 1000),
-  })), [sorted])
-
   const regionRows = REGIONS.map(region => {
     const sites = SITES.filter(s => s.region === region)
     const ids = new Set(sites.map(s => s.id))
@@ -163,26 +152,25 @@ export function ExecutiveSummary() {
         </Card>
 
         <Card
-          title={chart === 'margin' ? 'Margin vs target (%)' : 'Annual fee ($k)'}
+          className="bullet-card"
+          title={chart === 'margin' ? 'Margin vs contract target' : 'Annual management fee'}
           action={<Segmented options={[{ value: 'margin', label: 'Margin' }, { value: 'fee', label: 'Fee' }] as const} value={chart} onChange={setChart} />}
         >
-          <ChartFrame height={230}>
-            <ResponsiveContainer>
-              <BarChart data={chartData} margin={{ top: 6, right: 8, bottom: 0, left: -10 }}>
-                <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
-                <XAxis dataKey="label" tick={axisTick} tickLine={false} axisLine={{ stroke: 'var(--chart-grid)' }} interval={0} />
-                <YAxis tick={axisTick} tickLine={false} axisLine={false} domain={chart === 'margin' ? [0, 20] : undefined} />
-                <Tooltip content={<ChartTip unit={chart === 'margin' ? '%' : 'k'} />} cursor={{ fill: 'var(--surface-3)' }} />
-                {chart === 'margin' ? (
-                  <>
-                    <Bar dataKey="Actual" fill="var(--chart-1)" radius={[3, 3, 0, 0]} maxBarSize={22} />
-                    <Bar dataKey="Target" fill="var(--chart-2)" radius={[3, 3, 0, 0]} maxBarSize={22} />
-                  </>
-                ) : <Bar dataKey="Fee" fill="var(--chart-1)" radius={[3, 3, 0, 0]} maxBarSize={34} />}
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartFrame>
-          {chart === 'margin' && <MiniLegend items={[{ label: 'Actual margin', color: 'var(--chart-1)' }, { label: 'Contract target', color: 'var(--chart-2)' }]} />}
+          <CommercialBullets snapshots={snapshots} mode={chart} />
+          <div className="bullet-foot">
+            {chart === 'margin' ? (
+              <>
+                <span className="bullet-key"><span className="bullet-key__bar" /> actual margin</span>
+                <span className="bullet-key"><span className="bullet-key__tick" /> contract target</span>
+                <span className="right">Blended <strong>{pct(blendedActual)}</strong> vs {pct(blendedTarget)} target</span>
+              </>
+            ) : (
+              <>
+                <span className="bullet-key"><span className="bullet-key__bar" /> annual fee · label shows rate on managed spend</span>
+                <span className="right">Total <strong>{fmtUSD(fees)}</strong> · {pct((fees / managed) * 100)} blended</span>
+              </>
+            )}
+          </div>
         </Card>
       </div>
 
@@ -269,6 +257,63 @@ export function ExecutiveSummary() {
           </div>
         </Card>
       </div>
+    </div>
+  )
+}
+
+/** One row per account: bar = actual, tick = target (margin) or bar = annual fee. Rows share the
+    card's full height so the panel never leaves dead space beside a taller neighbour. */
+function CommercialBullets({ snapshots, mode }: { snapshots: ClientSnapshot[]; mode: ChartKey }) {
+  const rows = [...snapshots].sort((a, b) => mode === 'margin'
+    ? (a.commercials.actualMarginPct - a.commercials.targetMarginPct) - (b.commercials.actualMarginPct - b.commercials.targetMarginPct)
+    : b.commercials.annualFeeUSD - a.commercials.annualFeeUSD)
+  const max = mode === 'margin'
+    ? Math.ceil(Math.max(...rows.flatMap(r => [r.commercials.actualMarginPct, r.commercials.targetMarginPct])) / 5) * 5
+    : Math.max(...rows.map(r => r.commercials.annualFeeUSD))
+  // three labels only — the track is narrow beside the attention feed, so 5% steps would collide
+  const ticks = mode === 'margin' ? [0, max / 2, max] : []
+
+  return (
+    <div className="bullets" role="list">
+      {rows.map(r => {
+        const c = r.commercials
+        const delta = c.actualMarginPct - c.targetMarginPct
+        const value = mode === 'margin' ? c.actualMarginPct : c.annualFeeUSD
+        return (
+          <div key={r.client.id} className="bullet" role="listitem">
+            <div className="bullet__label">
+              <span className="bullet__name">{r.client.name.replace(' Technology', '')}</span>
+              <span className="bullet__meta">{c.model}</span>
+            </div>
+            <div className="bullet__track" aria-hidden>
+              <div className="bullet__fill" style={{ width: `${(value / max) * 100}%` }} />
+              {mode === 'margin' && <div className="bullet__target" style={{ left: `${(c.targetMarginPct / max) * 100}%` }} />}
+            </div>
+            <div className="bullet__value">
+              {mode === 'margin' ? (
+                <>
+                  <span className="exec-num">{pct(c.actualMarginPct)}</span>
+                  <Badge tone={marginTone(c.actualMarginPct, c.targetMarginPct)} dot={false}>{delta >= 0 ? '+' : '−'}{Math.abs(delta).toFixed(1)}</Badge>
+                </>
+              ) : (
+                <>
+                  <span className="exec-num">{fmtUSD(c.annualFeeUSD)}</span>
+                  <span className="muted">{pct(c.feePct)}</span>
+                </>
+              )}
+            </div>
+          </div>
+        )
+      })}
+      {mode === 'margin' && (
+        <div className="bullet bullet--axis" aria-hidden>
+          <div className="bullet__label" />
+          <div className="bullet__axis">
+            {ticks.map(t => <span key={t} style={{ left: `${(t / max) * 100}%` }}>{t}%</span>)}
+          </div>
+          <div className="bullet__value" />
+        </div>
+      )}
     </div>
   )
 }

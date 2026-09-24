@@ -235,3 +235,27 @@
 .site-card__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin: 0; }
 .site-card__stats dt { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
 .site-card__stats dd { font-size: var(--text-sm); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+
+/* ---------- commercial bullet chart (summary) ---------- */
+.bullet-card { display: flex; flex-direction: column; }
+.bullets { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 4px; min-height: 220px; }
+.bullet { display: grid; grid-template-columns: minmax(72px, 0.9fr) 3fr minmax(96px, auto); align-items: center; gap: 12px; min-height: 30px; }
+.bullet__label { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.bullet__name { font-size: var(--text-sm); font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bullet__meta { font-size: var(--text-xs); color: var(--ink-3); }
+.bullet__track { position: relative; height: 14px; border-radius: 3px; background: var(--surface-3); overflow: visible; }
+.bullet__fill { height: 100%; border-radius: 3px; background: var(--chart-1); transition: width 0.3s ease; }
+.bullet__target { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 1px; background: var(--ink); }
+.bullet__value { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: var(--text-sm); white-space: nowrap; }
+.bullet__value .exec-num { color: var(--ink); font-weight: 600; }
+.bullet--axis { min-height: 18px; }
+.bullet__axis { position: relative; height: 16px; border-top: 1px solid var(--border); }
+.bullet__axis span { position: absolute; top: 2px; transform: translateX(-50%); font-size: var(--text-xs); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bullet__axis span:first-child { transform: none; }
+.bullet__axis span:last-child { transform: translateX(-100%); }
+.bullet-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: var(--text-xs); color: var(--ink-2); }
+.bullet-foot strong { color: var(--ink); }
+.bullet-key { display: inline-flex; align-items: center; gap: 6px; }
+.bullet-key__bar { width: 14px; height: 8px; border-radius: 2px; background: var(--chart-1); }
+.bullet-key__tick { width: 3px; height: 12px; border-radius: 1px; background: var(--ink); }
