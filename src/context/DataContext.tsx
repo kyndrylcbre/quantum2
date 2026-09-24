@@ -4,8 +4,8 @@ import {
   seedRounds, seedTickets, siteById,
 } from '../data'
 import type {
-  Alarm, HandoverNote, HseEntry, Incident, Project, Risk, RoundInstance,
-  ShiftName, SyncEvent, Ticket,
+  Alarm, CapexDecision, CapexDecisionRecord, CapexPlanParams, HandoverNote, HseEntry, Incident,
+  Project, Risk, RoundInstance, ShiftName, SyncEvent, Ticket,
 } from '../data'
 
 /** Scope any siteId-carrying collection to the global site selector. */
@@ -23,6 +23,10 @@ interface DataState {
   risks: Risk[]
   projects: Project[]
   syncEvents: SyncEvent[]
+  /** Last agentic capital-plan run (parameters only — the plan itself is re-derived live). */
+  capexPlan: CapexPlanParams | null
+  /** Operator decisions on planner recommendations, keyed by asset id. */
+  capexDecisions: Record<string, CapexDecisionRecord>
 
   createTicket: (input: Omit<Ticket, 'id' | 'createdDaysAgo' | 'slaBreached' | 'source'>) => string
   updateTicket: (id: string, patch: Partial<Ticket>, action: string) => void
@@ -39,6 +43,9 @@ interface DataState {
   updateProject: (id: string, patch: Partial<Project>, action: string) => void
   /** Generic pull, e.g. re-sync from a DCIM. */
   pull: (system: string, action: string) => void
+  setCapexPlan: (params: CapexPlanParams | null) => void
+  decideCapex: (assetId: string, assetName: string, decision: CapexDecision, year?: number) => void
+  clearCapexDecision: (assetId: string) => void
 }
 
 const Ctx = createContext<DataState | null>(null)
@@ -53,6 +60,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [risks, setRisks] = useState<Risk[]>(seedRisks)
   const [projects, setProjects] = useState<Project[]>(seedProjects)
   const [syncEvents, setSyncEvents] = useState<SyncEvent[]>([])
+  const [capexPlan, setCapexPlan] = useState<CapexPlanParams | null>(null)
+  const [capexDecisions, setCapexDecisions] = useState<Record<string, CapexDecisionRecord>>({})
   const nextSync = useRef(1)
   const nextTicket = useRef(20000)
   const nextEntity = useRef(9000)
@@ -148,13 +157,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
     sync('Autodesk Construction Cloud', 'push', `${action} ${id}`)
   }, [sync])
 
+  const decideCapex = useCallback<DataState['decideCapex']>((assetId, assetName, decision, year) => {
+    setCapexDecisions(d => ({ ...d, [assetId]: { assetId, decision, year, at: Date.now() } }))
+    if (decision !== 'accepted') {
+      sync('Quantum MCP Hub', 'push', `${decision === 'deferred' ? `Defer to ${year}` : 'Dismiss'} — ${assetName}`)
+    }
+  }, [sync])
+
+  const clearCapexDecision = useCallback((assetId: string) => {
+    setCapexDecisions(d => { const next = { ...d }; delete next[assetId]; return next })
+  }, [])
+
   const value = useMemo<DataState>(() => ({
-    tickets, incidents, alarms, rounds, handovers, hse, risks, projects, syncEvents,
+    tickets, incidents, alarms, rounds, handovers, hse, risks, projects, syncEvents, capexPlan, capexDecisions,
     createTicket, updateTicket, ackAlarm, updateIncident, recordReading, addHandover, ackHandover,
     addHse, closeHse, addRisk, updateRisk, addProject, updateProject, pull,
-  }), [tickets, incidents, alarms, rounds, handovers, hse, risks, projects, syncEvents,
+    setCapexPlan, decideCapex, clearCapexDecision,
+  }), [tickets, incidents, alarms, rounds, handovers, hse, risks, projects, syncEvents, capexPlan, capexDecisions,
     createTicket, updateTicket, ackAlarm, updateIncident, recordReading, addHandover, ackHandover,
-    addHse, closeHse, addRisk, updateRisk, addProject, updateProject, pull])
+    addHse, closeHse, addRisk, updateRisk, addProject, updateProject, pull, decideCapex, clearCapexDecision])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

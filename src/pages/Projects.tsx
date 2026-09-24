@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
@@ -123,7 +124,8 @@ export function Projects() {
           ]} />
         </Card>
 
-        <Card title={`Capital plan candidates (${candidates.length})`}>
+        <Card title={`Capital plan candidates (${candidates.length})`}
+          action={<Link to="/capital" style={{ fontSize: 'var(--text-xs)', fontWeight: 600 }}>Open agentic planner →</Link>}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 280, overflowY: 'auto' }}>
             {candidates.slice(0, 12).map(c => (
               <div key={c.asset.id} style={{ borderBottom: '1px solid var(--border)', paddingBottom: 10 }}>

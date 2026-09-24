@@ -13,6 +13,7 @@ export { SITES, siteById } from './sites'
 export { CLIENTS, clientById, clientForSite, SERVICE_LINES } from './clients'
 export { commercialsFor, syntheticFootprintFor, type SyntheticFootprint } from './generate'
 export * from './clientHealth'
+export * from './capexPlanner'
 export {
   genSeries, mergedSeries, HOUR_LABELS, DAY_LABELS_14, MONTH_LABELS, TECHS, REPLACEMENT_COST,
 } from './generate'

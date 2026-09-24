@@ -20,6 +20,7 @@ import { HSE } from './pages/HSE'
 import { Risk } from './pages/Risk'
 import { Projects } from './pages/Projects'
 import { ExecutiveView } from './pages/ExecutiveView'
+import { CapitalPlanning } from './pages/CapitalPlanning'
 
 const BUILT: Record<string, React.ComponentType> = {
   '/': Dashboard,
@@ -35,6 +36,7 @@ const BUILT: Record<string, React.ComponentType> = {
   '/hse': HSE,
   '/risk': Risk,
   '/projects': Projects,
+  '/capital': CapitalPlanning,
 }
 
 /** Route table depends on the active persona: executives get the client-health interface only;

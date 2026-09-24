@@ -4,8 +4,8 @@ import {
 } from 'recharts'
 import { useData } from '../context/DataContext'
 import {
-  CLIENTS, HEALTH_WEIGHTS, OWNER_WEIGHT, SERVICE_LINES, snapshotsFor,
-  type ClientSnapshot, type RiskOwner,
+  buildPlan, CLIENTS, defaultParams, getEquipment, getHistory, getRacks, HEALTH_WEIGHTS, OWNER_WEIGHT,
+  SERVICE_LINES, snapshotsFor, type ClientSnapshot, type RiskOwner,
 } from '../data'
 import { Badge, Card, ChartTip, Segmented, sevTone, StatTile, type BadgeTone } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
@@ -270,6 +270,23 @@ function ServiceStrip({ services }: { services: ClientSnapshot['client']['servic
 function ClientDetail({ s }: { s: ClientSnapshot }) {
   const c = s.commercials
   const svcCount = s.client.services.length
+  const { alarms, tickets, risks, projects, capexDecisions } = useData()
+  /* balanced, unconstrained capital outlook from the agentic planner for this client's sites */
+  const outlook = useMemo(() => {
+    if (!s.onboarded) return null
+    const ids = new Set(s.sites.map(x => x.id))
+    return buildPlan({ ...defaultParams(), siteIds: s.sites.map(x => x.id) }, {
+      sites: s.sites,
+      equipment: getEquipment('all').filter(e => ids.has(e.siteId)),
+      alarms: alarms.filter(a => ids.has(a.siteId)),
+      tickets: tickets.filter(t => ids.has(t.siteId)),
+      risks: risks.filter(r => ids.has(r.siteId)),
+      projects: projects.filter(p => ids.has(p.siteId)),
+      racks: getRacks('all').filter(r => ids.has(r.siteId)),
+      history: getHistory,
+      decisions: capexDecisions,
+    })
+  }, [s, alarms, tickets, risks, projects, capexDecisions])
   return (
     <Card
       className="span-2"
@@ -376,6 +393,18 @@ function ClientDetail({ s }: { s: ClientSnapshot }) {
             {s.projects.overBudget > 0 && <Badge tone="critical" dot={false}>{s.projects.overBudget} over budget</Badge>}
             {s.projects.onHold > 0 && <Badge tone="serious" dot={false}>{s.projects.onHold} on hold</Badge>}
           </div>
+
+          {outlook && (
+            <>
+              <div className="card-title" style={{ marginTop: 14 }}><span>Capital outlook — planner, 5 yrs</span></div>
+              <div style={{ fontSize: 'var(--text-sm)' }}>
+                <strong>{fmtUSD(outlook.totals.planned)}</strong> across {outlook.totals.plannedCount} actions ·{' '}
+                {outlook.recs.filter(r => r.intervention === 'Replace').length} replacements ·{' '}
+                {fmtUSD(outlook.byYear[0]?.total ?? 0)} in {outlook.byYear[0]?.year}
+              </div>
+              <div className="exec-sub">Balanced baseline from asset condition, maintenance history, BMS alarms and whitespace telemetry — Operations → Capital Planning.</div>
+            </>
+          )}
 
           <div className="card-title" style={{ marginTop: 14 }}><span>Sites under contract — {s.siteCount}</span></div>
           {s.onboarded ? (

@@ -1,6 +1,6 @@
 import type { ComponentType, SVGProps } from 'react'
 import {
-  IconAsset, IconBirdseye, IconCapacity, IconDashboard, IconHSE, IconIncident,
+  IconAsset, IconBirdseye, IconCapacity, IconCapital, IconDashboard, IconHSE, IconIncident,
   IconIntegration, IconMonitor, IconOps, IconProject, IconRisk, IconRounds, IconTicket,
 } from './components/Icons'
 
@@ -8,7 +8,7 @@ export interface ModuleDef {
   path: string
   name: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
-  chunk: 1 | 2 | 3
+  chunk: 1 | 2 | 3 | 4
   built: boolean
   blurb: string
   integrates: string[]
@@ -47,6 +47,9 @@ export const MODULES: ModuleDef[] = [
   { path: '/projects', name: 'Projects', icon: IconProject, chunk: 3, built: true,
     blurb: 'Opex/capex project tracking and capital planning fed by assets, tickets, and monitoring for true lifecycle management.',
     integrates: ['Autodesk Construction Cloud', 'MS Project', 'Kahua'] },
+  { path: '/capital', name: 'Capital Planning', icon: IconCapital, chunk: 4, built: true,
+    blurb: 'Agentic capex planner — prompt-driven allocation of spend using asset condition, maintenance history, BMS alarms and whitespace telemetry.',
+    integrates: ['Autodesk Construction Cloud', 'Kahua', 'Quantum MCP Hub'] },
   { path: '/integrations', name: 'Integrations', icon: IconIntegration, chunk: 1, built: true,
     blurb: 'Live status of every API/MCP connection, internal and client-side.', integrates: [] },
 ]

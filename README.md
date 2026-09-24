@@ -40,6 +40,7 @@ Dev server: http://localhost:5180
 | HSE | 3 | ✅ Built — log/close observations, near misses, incidents; recordables tracking |
 | Risk Mgmt | 3 | ✅ Built — living register, 5×5 heat matrix, CBRE/Client/Shared ownership, review cadence |
 | Projects | 3 | ✅ Built — Kahua-synced opex/capex delivery + capital candidates auto-derived from asset lifecycle flags, promote-to-project |
+| Capital Planning | 5 | ✅ Built — agentic capex planner: prompt → horizon/envelope/priority/scope, urgency scored from CMMS condition & history, BMS alarms, DCIM telemetry and the risk register; streamed reasoning, Accept → Autodesk, Ask-the-planner follow-ups |
 | Executive view | 4 | ✅ Built — role-switched interface (user menu → "Executive view"): client health list across DCS accounts with weighted risk, incidents/outages, capex/opex spend, fees & margins, service matrix |
 
 ### Push-pull, not read-only
@@ -59,6 +60,7 @@ src/
   components/    Sidebar, TopBar, ui.tsx (Card/StatTile/Badge/Segmented), charts.tsx, Icons
   pages/         one file per module + ExecutiveView (role: executive), Stub
   data/clients.ts       DCS client roster + service lines; data/clientHealth.ts health/weighted-risk model
+  data/capexPlanner.ts  agentic capital planner engine (prompt interpretation, evidence scoring, envelope leveling)
   modules.tsx    module registry (nav, chunks, planned integrations)
 ```
 

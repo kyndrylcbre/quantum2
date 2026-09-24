@@ -296,3 +296,35 @@ export interface ClientCommercials {
   targetMarginPct: number
   actualMarginPct: number
 }
+
+/* ----- agentic capital planning ----- */
+export type CapexIntervention = 'Replace' | 'Refurbish' | 'Extend life' | 'Monitor'
+export type CapexPriority = 'balanced' | 'resilience' | 'efficiency' | 'compliance' | 'cost'
+
+/** What the planner understood from the operator's prompt (deterministic interpretation). */
+export interface CapexPlanParams {
+  prompt: string
+  startYear: number
+  horizonYears: number
+  /** Budget envelope per year in USD; null = unconstrained. */
+  envelopePerYearUSD: number | null
+  budgetCutPct: number
+  priority: CapexPriority
+  deferNonCritical: boolean
+  /** Explicit scope from the prompt (site ids); null = follow the global site selector. */
+  siteIds: string[] | null
+  clientId: string | null
+  kinds: EquipKind[] | null
+  /** Plain-language echo of the interpretation, shown in the agent log. */
+  understood: string[]
+  runAt: number
+}
+
+export type CapexDecision = 'accepted' | 'deferred' | 'dismissed'
+export interface CapexDecisionRecord {
+  assetId: string
+  decision: CapexDecision
+  /** For deferrals: the year the operator pushed the item to. */
+  year?: number
+  at: number
+}

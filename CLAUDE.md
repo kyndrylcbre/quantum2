@@ -53,6 +53,22 @@ leave empty for a deterministic synthetic snapshot ("Not yet onboarded"). Financ
 record is CBRE Vantage Analytics. Role switching is a demo shortcut — production maps roles
 from CBRE SSO groups.
 
+## Agentic capital planning
+
+`/capital` (`src/pages/CapitalPlanning.tsx`) is a prompt-driven planner. The engine is pure and
+deterministic in `src/data/capexPlanner.ts`: `interpretPrompt()` reads horizon, budget envelope
+(per-year or total), budget cuts, priority (resilience / efficiency / compliance / cost), deferral,
+scope (client name, site code or city) and asset classes from free text; `buildPlan()` scores every
+major M&E asset on condition 30% · age vs design life 20% · maintenance history 20% · BMS alarms &
+equipment state 20% · whitespace telemetry + linked risks + reactive WOs 10%, picks an intervention
+(Replace / Refurbish / Extend life / Monitor), assigns a natural year and levels against the envelope.
+Alarms match assets via `source` ("CRAH-03" → `<site>-crah-3`), tickets via `asset`, risks via
+category → asset-class map. The page streams the plan steps (pull steps raise sync events) and offers
+"Ask the planner" follow-ups answered from the same evidence. Plan parameters and Accept / Defer /
+Dismiss decisions live in DataContext (`capexPlan`, `capexDecisions`); Accept calls `addProject`,
+which pushes to Autodesk Construction Cloud and drops the asset from the open plan. The `Planner`
+inputs/outputs are the seam for a real Claude/MCP-backed planner later — no LLM is called today.
+
 ## Chunk roadmap
 
 Chunk 1 (done): shell, Dashboard, Monitoring, Birdseye, Ticketing, Integrations.
@@ -61,9 +77,11 @@ read/write Ticketing + alarm ack + sync-event layer.
 Chunk 3 (done): HSE, Risk Mgmt, Projects with capital planning derived from asset lifecycle
 flags + maintenance spend (promote-to-project pushes to Autodesk Construction Cloud). All 13 modules are now built.
 Chunk 4 (done, 2026-09-24): role-based shell + Executive view (client health list, 6 demo clients).
-Next: agentic capex planning — prompt-driven plan of where spend goes with smart suggestions from
-asset condition, maintenance history, alarms, and BMS/sensor data (Monitoring). Then the fuller
-client roster for the Executive view, real Emerald token true-up, real API/MCP integration layer.
+Chunk 5 (done, 2026-09-24): agentic Capital Planning module (see above); Executive view shows each
+client's planner outlook.
+Next: fuller client roster for the Executive view, real Emerald token true-up, real API/MCP
+integration layer (first candidate: swap the rules planner for a Claude/MCP planner behind the
+same `buildPlan` inputs).
 
 ## Repo
 
