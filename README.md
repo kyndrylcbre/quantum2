@@ -41,7 +41,7 @@ Dev server: http://localhost:5180
 | Risk Mgmt | 3 | ✅ Built — living register, 5×5 heat matrix, CBRE/Client/Shared ownership, review cadence |
 | Projects | 3 | ✅ Built — Kahua-synced opex/capex delivery + capital candidates auto-derived from asset lifecycle flags, promote-to-project |
 | Capital Planning | 5 | ✅ Built — agentic capex planner: prompt → horizon/envelope/priority/scope, urgency scored from CMMS condition & history, BMS alarms, DCIM telemetry and the risk register; streamed reasoning, Accept → Autodesk, Ask-the-planner follow-ups |
-| Executive view | 4 | ✅ Built — role-switched interface (user menu → "Executive view"): client health list across DCS accounts with weighted risk, incidents/outages, capex/opex spend, fees & margins, service matrix |
+| Executive view | 4 | ✅ Built — role-switched interface (user menu → "Executive view"): organization Summary (KPIs, attention feed, roster, service coverage, regions) + per-client dashboards from the sidebar client list — health, weighted risk, incidents/outages, capex/opex spend, fees & margins, services, IT-load trend, capital outlook, sites |
 
 ### Push-pull, not read-only
 
@@ -58,7 +58,7 @@ src/
   data/          types.ts, sites.ts (the 10 sites), generate.ts (seeded generators), index.ts (store)
   context/       AppContext (global site scope + theme + role persona), DataContext (mutable store + sync events)
   components/    Sidebar, TopBar, ui.tsx (Card/StatTile/Badge/Segmented), charts.tsx, Icons
-  pages/         one file per module + ExecutiveView (role: executive), Stub
+  pages/         one file per module + ExecutiveSummary / ClientDashboard (role: executive), Stub
   data/clients.ts       DCS client roster + service lines; data/clientHealth.ts health/weighted-risk model
   data/capexPlanner.ts  agentic capital planner engine (prompt interpretation, evidence scoring, envelope leveling)
   modules.tsx    module registry (nav, chunks, planned integrations)

@@ -19,7 +19,8 @@ import { Assets } from './pages/Assets'
 import { HSE } from './pages/HSE'
 import { Risk } from './pages/Risk'
 import { Projects } from './pages/Projects'
-import { ExecutiveView } from './pages/ExecutiveView'
+import { ExecutiveSummary } from './pages/ExecutiveSummary'
+import { ClientDashboard } from './pages/ClientDashboard'
 import { CapitalPlanning } from './pages/CapitalPlanning'
 
 const BUILT: Record<string, React.ComponentType> = {
@@ -48,7 +49,8 @@ function Routed() {
     return (
       <main className="app-content">
         <Routes>
-          <Route path="/executive" element={<ExecutiveView />} />
+          <Route path="/executive" element={<ExecutiveSummary />} />
+          <Route path="/executive/:clientId" element={<ClientDashboard />} />
           <Route path="*" element={<Navigate to="/executive" replace />} />
         </Routes>
       </main>
@@ -68,7 +70,7 @@ function Routed() {
             />
           )
         })}
-        <Route path="/executive" element={<Navigate to="/" replace />} />
+        <Route path="/executive/*" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Stub mod={MODULES[0]} />} />
       </Routes>
     </main>

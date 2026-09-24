@@ -42,16 +42,20 @@ this pattern; never mutate the static store in `src/data`.
 
 `useApp().role` is `'ops' | 'executive'` (persisted as `qtm.role`), switched from the header
 user chip (`src/components/UserMenu.tsx`). `App.tsx` swaps the whole route table per role and
-`Sidebar.tsx` swaps the nav: ops = 13 modules + site selector; executive = `/executive` only.
-The **Executive view** (`src/pages/ExecutiveView.tsx`) lists CBRE DCS clients from
-`src/data/clients.ts` with health, weighted risk, incidents/outages, capex/opex project
-spend, management fee/margin, and a fixed-order service matrix (M&E, Raised Floor, Projects,
-E&S, Space Planning, Lease Admin). Scoring lives in `src/data/clientHealth.ts` — pure functions
-over the live DataContext arrays; contract commercials come from `commercialsFor()` in
-`generate.ts`. To add a client: append to `CLIENTS`; map `siteIds` for live-derived metrics or
-leave empty for a deterministic synthetic snapshot ("Not yet onboarded"). Financial system of
-record is CBRE Vantage Analytics. Role switching is a demo shortcut — production maps roles
-from CBRE SSO groups.
+`Sidebar.tsx` swaps the nav: ops = 14 modules + site selector; executive = **Summary**
+(`/executive`, `src/pages/ExecutiveSummary.tsx`) plus one nav entry per DCS account (worst health
+first, score pill) opening a **client dashboard** (`/executive/:clientId`,
+`src/pages/ClientDashboard.tsx`). The summary is the holistic organization view: commercial and
+operational KPI rows, an attention feed, margin/fee chart, the account roster table, a service
+coverage matrix and regional footprint. The client dashboard covers health, weighted risk,
+incidents/outages, margin, contract & services, drivers and top risks, spend, IT-load trend by
+site, the planner's capital outlook, and the sites under contract with systems of record. Clients
+come from `src/data/clients.ts`; scoring lives in `src/data/clientHealth.ts` (pure functions over
+the live DataContext arrays); contract commercials come from `commercialsFor()` in `generate.ts`;
+shared exec UI bits are in `src/components/exec.tsx`. To add a client: append to `CLIENTS`; map
+`siteIds` for live-derived metrics or leave empty for a deterministic synthetic snapshot ("Not yet
+onboarded"). Financial system of record is CBRE Vantage Analytics. Role switching is a demo
+shortcut — production maps roles from CBRE SSO groups.
 
 ## Agentic capital planning
 
@@ -77,8 +81,8 @@ read/write Ticketing + alarm ack + sync-event layer.
 Chunk 3 (done): HSE, Risk Mgmt, Projects with capital planning derived from asset lifecycle
 flags + maintenance spend (promote-to-project pushes to Autodesk Construction Cloud). All 13 modules are now built.
 Chunk 4 (done, 2026-09-24): role-based shell + Executive view (client health list, 6 demo clients).
-Chunk 5 (done, 2026-09-24): agentic Capital Planning module (see above); Executive view shows each
-client's planner outlook.
+Chunk 5 (done, 2026-09-24): agentic Capital Planning module (see above); Executive view
+restructured into Summary + per-client dashboards with the client list in the sidebar.
 Next: fuller client roster for the Executive view, real Emerald token true-up, real API/MCP
 integration layer (first candidate: swap the rules planner for a Claude/MCP planner behind the
 same `buildPlan` inputs).
