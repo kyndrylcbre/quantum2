@@ -46,8 +46,9 @@ user chip (`src/components/UserMenu.tsx`). `App.tsx` swaps the whole route table
 (`/executive`, `src/pages/ExecutiveSummary.tsx`) plus one nav entry per DCS account (worst health
 first, score pill) opening a **client dashboard** (`/executive/:clientId`,
 `src/pages/ClientDashboard.tsx`). The summary is the holistic organization view: commercial and
-operational KPI rows, an attention feed, margin/fee chart, the account roster table, a service
-coverage matrix and regional footprint. The client dashboard covers health, weighted risk,
+operational KPI rows, an attention feed, margin/fee chart, account scorecards (a responsive card
+grid — no wide tables on exec pages), a service coverage matrix and regional footprint. Exec pages
+are wrapped in `.exec-page`, whose responsive rules live at the bottom of `executive.css`. The client dashboard covers health, weighted risk,
 incidents/outages, margin, contract & services, drivers and top risks, spend, IT-load trend by
 site, the planner's capital outlook, and the sites under contract with systems of record. Clients
 come from `src/data/clients.ts`; scoring lives in `src/data/clientHealth.ts` (pure functions over

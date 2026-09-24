@@ -61,7 +61,7 @@ function Dashboard({ client }: { client: Client }) {
   })
 
   return (
-    <div>
+    <div className="exec-page">
       <div className="page-header row">
         <div>
           <h1>{client.name}</h1>
@@ -117,18 +117,22 @@ function Dashboard({ client }: { client: Client }) {
             <dt>Financials</dt><dd className="muted" style={{ fontWeight: 400 }}>{FINANCE_SOURCE}</dd>
           </dl>
           <div className="card-title" style={{ marginTop: 14 }}><span>Services in scope — {client.services.length} of {SERVICE_LINES.length}</span></div>
-          <ul className="svc-list">
+          <ul className="svc-grid">
             {SERVICE_LINES.map(l => {
               const on = client.services.includes(l.key)
               return (
-                <li key={l.key} className={on ? 'on' : 'off'}>
+                <li key={l.key} className={on ? 'on' : 'off'} title={on ? l.blurb : `${l.key} — not in scope, cross-sell opportunity`}>
                   <span className="svc-mark" aria-hidden>{on ? '✓' : '–'}</span>
                   <span className="svc-name">{l.key}</span>
-                  <span className="svc-blurb">{on ? l.blurb : 'Not in scope — cross-sell opportunity'}</span>
                 </li>
               )
             })}
           </ul>
+          <div className="exec-sub" style={{ marginTop: 8 }}>
+            {client.services.length < SERVICE_LINES.length
+              ? `Not in scope: ${SERVICE_LINES.filter(l => !client.services.includes(l.key)).map(l => l.key).join(', ')} — cross-sell white space.`
+              : 'Full DCS service line in scope.'}
+          </div>
         </Card>
 
         {/* health & risk */}
@@ -194,7 +198,7 @@ function Dashboard({ client }: { client: Client }) {
 
       {s.onboarded && (
         <>
-          <div className="grid cols-3" style={{ marginBottom: 'var(--gap-md)' }}>
+          <div className="grid cols-3 exec-row" style={{ marginBottom: 'var(--gap-md)' }}>
             <Card className="span-2" title="IT load by site — 14 days (MW)">
               <ChartFrame height={220}>
                 <ResponsiveContainer>
@@ -204,7 +208,7 @@ function Dashboard({ client }: { client: Client }) {
                     <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={(v: number) => v.toFixed(0)} />
                     <Tooltip content={<ChartTip unit=" MW" />} cursor={{ stroke: 'var(--chart-ref)', strokeDasharray: '3 3' }} />
                     {s.sites.map((site, i) => (
-                      <Line key={site.id} type="monotone" dataKey={site.code} stroke={CHART_VARS[i % CHART_VARS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                      <Line key={site.id} type="monotone" dataKey={site.code} stroke={CHART_VARS[i % CHART_VARS.length]} strokeWidth={2} dot={false} activeDot={{ r: 4 }} isAnimationActive={false} />
                     ))}
                   </LineChart>
                 </ResponsiveContainer>
@@ -238,33 +242,29 @@ function Dashboard({ client }: { client: Client }) {
           </div>
 
           <Card title={`Sites under contract — ${s.siteCount}`}>
-            <div className="table-scroll">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Site</th><th>Region</th><th>Tier</th>
-                    <th className="num">IT load</th><th className="num">Utilization</th><th className="num">PUE</th>
-                    <th className="num">Hot racks</th><th className="num">Critical alarms</th><th className="num">Open WOs</th>
-                    <th>Systems of record</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {siteRows.map(({ site, hot, crit, open, util }) => (
-                    <tr key={site.id}>
-                      <td><strong>{site.code}</strong> <span className="muted">{site.name} · {site.city}</span></td>
-                      <td>{site.region}</td>
-                      <td>{site.tier}</td>
-                      <td className="num">{site.itLoadMW.toFixed(1)} MW</td>
-                      <td className="num">{util.toFixed(0)}%</td>
-                      <td className="num">{site.currentPUE.toFixed(2)}</td>
-                      <td className="num">{hot > 0 ? <Badge tone="warn" dot={false}>{hot}</Badge> : '0'}</td>
-                      <td className="num">{crit > 0 ? <Badge tone="critical" dot={false}>{crit}</Badge> : '0'}</td>
-                      <td className="num">{open}</td>
-                      <td className="muted" style={{ fontSize: 'var(--text-xs)' }}>{site.dcim} · {site.bms} · {site.cmms}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="site-cards">
+              {siteRows.map(({ site, hot, crit, open, util }) => (
+                <div key={site.id} className="site-card">
+                  <div className="site-card__head">
+                    <strong>{site.code}</strong>
+                    <span className="muted">{site.name} · {site.city}</span>
+                  </div>
+                  <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                    <Badge tone="neutral" dot={false}>{site.region}</Badge>
+                    <Badge tone="neutral" dot={false}>Tier {site.tier}</Badge>
+                    <Badge tone="neutral" dot={false}>{site.halls} hall{site.halls === 1 ? '' : 's'}</Badge>
+                  </div>
+                  <dl className="site-card__stats">
+                    <div><dt>IT load</dt><dd>{site.itLoadMW.toFixed(1)} MW</dd></div>
+                    <div><dt>Utilization</dt><dd>{util.toFixed(0)}%</dd></div>
+                    <div><dt>PUE</dt><dd>{site.currentPUE.toFixed(2)}</dd></div>
+                    <div><dt>Hot racks</dt><dd>{hot > 0 ? <Badge tone="warn" dot={false}>{hot}</Badge> : '0'}</dd></div>
+                    <div><dt>Critical alarms</dt><dd>{crit > 0 ? <Badge tone="critical" dot={false}>{crit}</Badge> : '0'}</dd></div>
+                    <div><dt>Open WOs</dt><dd>{open}</dd></div>
+                  </dl>
+                  <div className="site-sor">{site.dcim} · {site.bms} · {site.cmms}</div>
+                </div>
+              ))}
             </div>
           </Card>
         </>

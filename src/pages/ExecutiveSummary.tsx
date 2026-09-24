@@ -10,7 +10,7 @@ import {
 } from '../data'
 import { Badge, Card, ChartTip, Segmented, StatTile, type BadgeTone } from '../components/ui'
 import { axisTick, ChartFrame, MiniLegend } from '../components/charts'
-import { FINANCE_SOURCE, HealthMeter, marginTone, pct, ServiceStrip } from '../components/exec'
+import { FINANCE_SOURCE, marginTone, pct, ServiceStrip } from '../components/exec'
 import { EmeraldButton } from '../emerald'
 import '../styles/executive.css'
 
@@ -103,7 +103,7 @@ export function ExecutiveSummary() {
   const open = (id: string) => navigate(`/executive/${id}`)
 
   return (
-    <div>
+    <div className="exec-page">
       <div className="page-header row">
         <div>
           <h1>Executive summary</h1>
@@ -143,7 +143,7 @@ export function ExecutiveSummary() {
           sub={<span className="muted">{outlook.totals.plannedCount} actions · {fmtUSD(outlook.byYear[0]?.total ?? 0)} in {outlook.byYear[0]?.year} · planner baseline</span>} />
       </div>
 
-      <div className="grid cols-3" style={{ marginBottom: 'var(--gap-md)' }}>
+      <div className="grid cols-3 exec-row" style={{ marginBottom: 'var(--gap-md)' }}>
         <Card className="span-2" title="What needs attention">
           {attention.length === 0 && <div className="exec-empty">Nothing outstanding — every account is healthy, on margin and outage-free.</div>}
           <ul className="attention-list">
@@ -163,7 +163,7 @@ export function ExecutiveSummary() {
         </Card>
 
         <Card
-          title={chart === 'margin' ? 'Margin — actual vs target (%)' : 'Annual management fee ($k)'}
+          title={chart === 'margin' ? 'Margin vs target (%)' : 'Annual fee ($k)'}
           action={<Segmented options={[{ value: 'margin', label: 'Margin' }, { value: 'fee', label: 'Fee' }] as const} value={chart} onChange={setChart} />}
         >
           <ChartFrame height={230}>
@@ -201,41 +201,23 @@ export function ExecutiveSummary() {
         <span className="muted" style={{ fontSize: 'var(--text-sm)' }}>Select an account to open its dashboard</span>
       </div>
 
-      <Card className="exec-table-card">
-        <div className="table-scroll">
-          <table className="data-table exec-table">
-            <thead>
-              <tr>
-                <th>Client</th>
-                <th style={{ minWidth: 150 }}>Health</th>
-                <th className="num">Weighted risk</th>
-                <th className="num">Incidents · outages <span className="th-sub">90d</span></th>
-                <th className="num">Project spend <span className="th-sub">spent / budget</span></th>
-                <th className="num">Mgmt fee <span className="th-sub">annual</span></th>
-                <th className="num">Margin <span className="th-sub">vs target</span></th>
-                <th>Services</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map(s => <ClientRow key={s.client.id} s={s} onOpen={() => open(s.client.id)} />)}
-            </tbody>
-          </table>
-        </div>
-        <div className="exec-footnote">
-          <strong>Health</strong> = 100 − weighted penalties: weighted risk {Math.round(HEALTH_WEIGHTS.risk * 100)}% · incidents & outages {Math.round(HEALTH_WEIGHTS.incidents * 100)}% · margin vs target {Math.round(HEALTH_WEIGHTS.margin * 100)}% · project delivery {Math.round(HEALTH_WEIGHTS.delivery * 100)}%.
-          {' '}<strong>Weighted risk</strong> = Σ likelihood × impact × ownership weight (CBRE {OWNER_WEIGHT.CBRE} · Shared {OWNER_WEIGHT.Shared} · Client {OWNER_WEIGHT.Client}) over live risks, per site.
-          {' '}Financials from {FINANCE_SOURCE}; operational data live from each site’s CMMS/BMS/DCIM via Quantum.
-        </div>
-      </Card>
+      <div className="scorecards">
+        {sorted.map(s => <Scorecard key={s.client.id} s={s} onOpen={() => open(s.client.id)} />)}
+      </div>
+      <div className="exec-footnote" style={{ borderTop: 'none', marginTop: 6 }}>
+        <strong>Health</strong> = 100 − weighted penalties: weighted risk {Math.round(HEALTH_WEIGHTS.risk * 100)}% · incidents & outages {Math.round(HEALTH_WEIGHTS.incidents * 100)}% · margin vs target {Math.round(HEALTH_WEIGHTS.margin * 100)}% · project delivery {Math.round(HEALTH_WEIGHTS.delivery * 100)}%.
+        {' '}<strong>Weighted risk</strong> = Σ likelihood × impact × ownership weight (CBRE {OWNER_WEIGHT.CBRE} · Shared {OWNER_WEIGHT.Shared} · Client {OWNER_WEIGHT.Client}) over live risks, per site.
+        {' '}Financials from {FINANCE_SOURCE}; operational data live from each site’s CMMS/BMS/DCIM via Quantum.
+      </div>
 
-      <div className="grid cols-3" style={{ marginTop: 'var(--gap-md)' }}>
+      <div className="grid cols-3 exec-row" style={{ marginTop: 'var(--gap-md)' }}>
         <Card className="span-2" title="Service coverage — where each account buys from DCS">
           <div className="table-scroll">
             <table className="data-table svc-matrix">
               <thead>
                 <tr>
                   <th>Client</th>
-                  {SERVICE_LINES.map(l => <th key={l.key} title={l.blurb}>{l.key}</th>)}
+                  {SERVICE_LINES.map(l => <th key={l.key} title={`${l.key} — ${l.blurb}`} aria-label={l.key}>{l.abbr}</th>)}
                   <th className="num">Scope</th>
                 </tr>
               </thead>
@@ -261,7 +243,9 @@ export function ExecutiveSummary() {
               </tbody>
             </table>
           </div>
-          <div className="exec-sub" style={{ marginTop: 8 }}>Gaps are cross-sell white space — Lease Admin and Space Planning have the most headroom across the roster.</div>
+          <div className="exec-sub" style={{ marginTop: 8 }}>
+            {SERVICE_LINES.map(l => `${l.abbr} ${l.key}`).join(' · ')}. Gaps are cross-sell white space — Lease Admin and Space Planning have the most headroom across the roster.
+          </div>
         </Card>
 
         <Card title="Footprint by region">
@@ -289,49 +273,59 @@ export function ExecutiveSummary() {
   )
 }
 
-function ClientRow({ s, onOpen }: { s: ClientSnapshot; onOpen: () => void }) {
+function Scorecard({ s, onOpen }: { s: ClientSnapshot; onOpen: () => void }) {
   const c = s.commercials
   const delta = c.actualMarginPct - c.targetMarginPct
   return (
-    <tr className="clickable" onClick={onOpen}>
-      <td>
-        <div className="exec-client">
-          <strong>{s.client.name}</strong>
-          {!s.onboarded && <Badge tone="neutral" dot={false}>Not yet onboarded</Badge>}
+    <button type="button" className="scorecard" onClick={onOpen} aria-label={`Open ${s.client.name} dashboard`}>
+      <div className="scorecard__head">
+        <div className="scorecard__id">
+          <span className="scorecard__name">{s.client.name}</span>
+          <span className="scorecard__meta">
+            {s.client.sector} · {s.siteCount} site{s.siteCount === 1 ? '' : 's'} · {s.itLoadMW.toFixed(1)} MW{!s.onboarded && ' · not yet onboarded'}
+          </span>
         </div>
-        <div className="exec-sub">{s.client.sector} · {s.siteCount} site{s.siteCount === 1 ? '' : 's'} · {s.itLoadMW.toFixed(1)} MW</div>
-      </td>
-      <td><HealthMeter s={s} /></td>
-      <td className="num">
-        <Badge tone={s.risk.tone} dot={false}>{s.risk.perSite} · {s.risk.band}</Badge>
-        <div className="exec-sub">{s.risk.live} live · {s.risk.high} high</div>
-      </td>
-      <td className="num">
-        <span className="exec-num">{s.incidents.total90d}</span>
-        <div className="exec-sub row" style={{ justifyContent: 'flex-end', gap: 4 }}>
-          {s.incidents.sev1 > 0
-            ? <Badge tone="critical" dot={false}>{s.incidents.sev1} outage{s.incidents.sev1 === 1 ? '' : 's'}</Badge>
-            : <span>no outages</span>}
-          {s.incidents.active > 0 && <Badge tone="warn" dot={false}>{s.incidents.active} active</Badge>}
+        <Badge tone={s.health.tone} dot={false}>{s.health.band} · {s.health.score}</Badge>
+      </div>
+      <div className="health__meter"><div style={{ width: `${s.health.score}%`, background: `var(--status-${s.health.tone})` }} /></div>
+
+      <dl className="scorecard__stats">
+        <div>
+          <dt>Weighted risk</dt>
+          <dd><Badge tone={s.risk.tone} dot={false}>{s.risk.perSite} · {s.risk.band}</Badge> <span className="muted">{s.risk.live} live</span></dd>
         </div>
-      </td>
-      <td className="num">
-        <div><span className="exec-kind">Capex</span> {fmtUSD(s.projects.capexSpent)} <span className="muted">/ {fmtUSD(s.projects.capexBudget)}</span></div>
-        <div><span className="exec-kind">Opex</span> {fmtUSD(s.projects.opexSpent)} <span className="muted">/ {fmtUSD(s.projects.opexBudget)}</span></div>
-      </td>
-      <td className="num">
-        <span className="exec-num">{fmtUSD(c.annualFeeUSD)}</span>
-        <div className="exec-sub">{pct(c.feePct)} · {c.model}</div>
-      </td>
-      <td className="num">
-        <span className="exec-num">{pct(c.actualMarginPct)}</span>
-        <div className="exec-sub">
-          <Badge tone={marginTone(c.actualMarginPct, c.targetMarginPct)} dot={false}>
-            {delta >= 0 ? '+' : '−'}{Math.abs(delta).toFixed(1)} vs {pct(c.targetMarginPct)}
-          </Badge>
+        <div>
+          <dt>Incidents · 90d</dt>
+          <dd>
+            <span className="exec-num">{s.incidents.total90d}</span>{' '}
+            {s.incidents.sev1 > 0
+              ? <Badge tone="critical" dot={false}>{s.incidents.sev1} outage{s.incidents.sev1 === 1 ? '' : 's'}</Badge>
+              : <span className="muted">no outages</span>}
+            {s.incidents.active > 0 && <> <Badge tone="warn" dot={false}>{s.incidents.active} active</Badge></>}
+          </dd>
         </div>
-      </td>
-      <td><ServiceStrip services={s.client.services} /></td>
-    </tr>
+        <div>
+          <dt>Mgmt fee</dt>
+          <dd><span className="exec-num">{fmtUSD(c.annualFeeUSD)}</span> <span className="muted">{pct(c.feePct)} · {c.model}</span></dd>
+        </div>
+        <div>
+          <dt>Margin</dt>
+          <dd>
+            <span className="exec-num">{pct(c.actualMarginPct)}</span>{' '}
+            <Badge tone={marginTone(c.actualMarginPct, c.targetMarginPct)} dot={false}>{delta >= 0 ? '+' : '−'}{Math.abs(delta).toFixed(1)} vs {pct(c.targetMarginPct)}</Badge>
+          </dd>
+        </div>
+      </dl>
+
+      <div className="scorecard__spend">
+        <span><span className="exec-kind">Capex</span> {fmtUSD(s.projects.capexSpent)} <span className="muted">/ {fmtUSD(s.projects.capexBudget)}</span></span>
+        <span><span className="exec-kind">Opex</span> {fmtUSD(s.projects.opexSpent)} <span className="muted">/ {fmtUSD(s.projects.opexBudget)}</span></span>
+      </div>
+
+      <div className="scorecard__foot">
+        <ServiceStrip services={s.client.services} />
+        <span className="scorecard__go">Open dashboard →</span>
+      </div>
+    </button>
   )
 }
