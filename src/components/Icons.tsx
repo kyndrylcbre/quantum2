@@ -64,3 +64,6 @@ export const IconBell = (p: SVGProps<SVGSVGElement>) => (
 export const IconChevron = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M9 6l6 6-6 6"/></svg>
 )
+export const IconExecutive = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 12h18"/></svg>
+)

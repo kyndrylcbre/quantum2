@@ -267,3 +267,32 @@ export interface SeriesPoint {
   t: string // label
   [key: string]: string | number
 }
+
+/* ----- clients & executive view ----- */
+export type ServiceLineKey =
+  | 'M&E' | 'Raised Floor' | 'Projects' | 'E&S' | 'Space Planning' | 'Lease Admin'
+export type ContractModel = 'Fixed fee' | 'Cost-plus' | 'GMP'
+
+export interface Client {
+  id: string
+  name: string
+  sector: string // e.g. "IT services", "Hyperscale"
+  /** Quantum sites under this client's contract. Empty = footprint not yet onboarded to Quantum;
+      the executive view then falls back to a deterministic synthetic snapshot. */
+  siteIds: string[]
+  services: ServiceLineKey[]
+  accountLead: string
+  hq: string
+}
+
+/** Deterministic contract commercials for a client (see generate.ts → commercialsFor). */
+export interface ClientCommercials {
+  model: ContractModel
+  termStart: number // year
+  termEnd: number
+  managedSpendUSD: number // annual cost to operate under management
+  feePct: number // management fee as % of managed spend
+  annualFeeUSD: number
+  targetMarginPct: number
+  actualMarginPct: number
+}

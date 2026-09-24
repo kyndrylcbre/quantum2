@@ -1,8 +1,8 @@
 import { hashSeed, mulberry32, pick, randFloat, randInt, weighted, type Rng } from './rng'
 import { SITES } from './sites'
 import type {
-  Alarm, HandoverNote, HseEntry, Incident, Integration, MaintenanceEntry, MechEquipment,
-  OpsProfile, Project, Rack, Risk, RoundInstance, SeriesPoint, ServiceLine, Site, Ticket,
+  Alarm, Client, ClientCommercials, HandoverNote, HseEntry, Incident, Integration, MaintenanceEntry,
+  MechEquipment, OpsProfile, Project, Rack, Risk, RoundInstance, SeriesPoint, ServiceLine, Site, Ticket,
 } from './types'
 
 export const TECHS = [
@@ -590,4 +590,77 @@ export function mergedSeries(
     per.forEach(({ site, series }) => { row[site.code] = series[i].value })
     return row
   })
+}
+
+/* ---------------------- client commercials ------------------------ */
+
+/** Deterministic contract commercials. `managedSpendUSD` is the annual cost to operate under
+    management (from mapped sites, or the synthetic footprint for un-onboarded clients). */
+export function commercialsFor(client: Client, managedSpendUSD: number): ClientCommercials {
+  const rng = mulberry32(hashSeed(client.id + ':account'))
+  const model = weighted(rng, [['Fixed fee', 40], ['Cost-plus', 40], ['GMP', 20]] as const)
+  // Fee % of managed spend: fixed-fee deals price higher for the risk they carry.
+  const feePct = model === 'Fixed fee' ? randFloat(rng, 6.0, 8.5) : model === 'GMP' ? randFloat(rng, 5.0, 7.0) : randFloat(rng, 4.0, 6.0)
+  const targetMarginPct = randFloat(rng, 9, 15)
+  // Actual margin drifts around target; a minority of accounts run materially under.
+  const drift = weighted(rng, [[randFloat(rng, -1.5, 2.5), 65], [randFloat(rng, -6, -2), 25], [randFloat(rng, 2.5, 4.5), 10]] as const)
+  const termStart = randInt(rng, 2021, 2025)
+  return {
+    model,
+    termStart,
+    termEnd: termStart + pick(rng, [3, 5, 5, 7]),
+    managedSpendUSD,
+    feePct,
+    annualFeeUSD: Math.round(managedSpendUSD * feePct / 100),
+    targetMarginPct,
+    actualMarginPct: +(targetMarginPct + drift).toFixed(1),
+  }
+}
+
+/** Synthetic operating footprint for a client with no Quantum sites mapped yet. */
+export interface SyntheticFootprint {
+  sites: number
+  itLoadMW: number
+  annualOpexUSD: number
+  liveRisks: number
+  weightedRisk: number // Σ L×I×ownerWeight
+  highRisks: number
+  incidents90d: number
+  sev1: number
+  active: number
+  capexBudget: number
+  capexSpent: number
+  opexBudget: number
+  opexSpent: number
+  projectsInFlight: number
+  projectsOverBudget: number
+  onHold: number
+}
+
+export function syntheticFootprintFor(client: Client): SyntheticFootprint {
+  const rng = mulberry32(hashSeed(client.id + ':footprint'))
+  const sites = randInt(rng, 1, 6)
+  const itLoadMW = +(sites * randFloat(rng, 4, 14)).toFixed(1)
+  const liveRisks = sites * randInt(rng, 3, 7)
+  const inFlight = sites * randInt(rng, 1, 3)
+  const capexBudget = sites * randInt(rng, 400, 2400) * 1000
+  const opexBudget = sites * randInt(rng, 60, 300) * 1000
+  return {
+    sites,
+    itLoadMW,
+    annualOpexUSD: Math.round(itLoadMW * randInt(rng, 950, 1250) * 1000),
+    liveRisks,
+    weightedRisk: Math.round(liveRisks * randFloat(rng, 5, 9)),
+    highRisks: Math.round(liveRisks * randFloat(rng, 0.15, 0.4)),
+    incidents90d: sites * randInt(rng, 0, 3),
+    sev1: rng() < 0.3 ? 1 : 0,
+    active: rng() < 0.35 ? 1 : 0,
+    capexBudget,
+    capexSpent: Math.round(capexBudget * randFloat(rng, 0.2, 0.7, 2)),
+    opexBudget,
+    opexSpent: Math.round(opexBudget * randFloat(rng, 0.3, 0.9, 2)),
+    projectsInFlight: inFlight,
+    projectsOverBudget: rng() < 0.4 ? randInt(rng, 1, 2) : 0,
+    onHold: rng() < 0.3 ? 1 : 0,
+  }
 }

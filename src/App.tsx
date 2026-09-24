@@ -1,5 +1,5 @@
-import { HashRouter, Route, Routes } from 'react-router-dom'
-import { AppProvider } from './context/AppContext'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AppProvider, useApp } from './context/AppContext'
 import { DataProvider } from './context/DataContext'
 import { Sidebar } from './components/Sidebar'
 import { AppHeader } from './components/AppHeader'
@@ -19,6 +19,7 @@ import { Assets } from './pages/Assets'
 import { HSE } from './pages/HSE'
 import { Risk } from './pages/Risk'
 import { Projects } from './pages/Projects'
+import { ExecutiveView } from './pages/ExecutiveView'
 
 const BUILT: Record<string, React.ComponentType> = {
   '/': Dashboard,
@@ -36,7 +37,22 @@ const BUILT: Record<string, React.ComponentType> = {
   '/projects': Projects,
 }
 
+/** Route table depends on the active persona: executives get the client-health interface only;
+    operations gets the 13 modules. Unknown paths bounce to that persona's home. */
 function Routed() {
+  const { role } = useApp()
+
+  if (role === 'executive') {
+    return (
+      <main className="app-content">
+        <Routes>
+          <Route path="/executive" element={<ExecutiveView />} />
+          <Route path="*" element={<Navigate to="/executive" replace />} />
+        </Routes>
+      </main>
+    )
+  }
+
   return (
     <main className="app-content">
       <Routes>
@@ -50,6 +66,7 @@ function Routed() {
             />
           )
         })}
+        <Route path="/executive" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Stub mod={MODULES[0]} />} />
       </Routes>
     </main>

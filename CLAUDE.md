@@ -38,6 +38,21 @@ sync event (pushing → confirmed) against the owning external system, surfaced 
 `SyncTray` toasts and the Integrations activity feed. New writable features must follow
 this pattern; never mutate the static store in `src/data`.
 
+## Role-based views (personas)
+
+`useApp().role` is `'ops' | 'executive'` (persisted as `qtm.role`), switched from the header
+user chip (`src/components/UserMenu.tsx`). `App.tsx` swaps the whole route table per role and
+`Sidebar.tsx` swaps the nav: ops = 13 modules + site selector; executive = `/executive` only.
+The **Executive view** (`src/pages/ExecutiveView.tsx`) lists CBRE DCS clients from
+`src/data/clients.ts` with health, weighted risk, incidents/outages, capex/opex project
+spend, management fee/margin, and a fixed-order service matrix (M&E, Raised Floor, Projects,
+E&S, Space Planning, Lease Admin). Scoring lives in `src/data/clientHealth.ts` — pure functions
+over the live DataContext arrays; contract commercials come from `commercialsFor()` in
+`generate.ts`. To add a client: append to `CLIENTS`; map `siteIds` for live-derived metrics or
+leave empty for a deterministic synthetic snapshot ("Not yet onboarded"). Financial system of
+record is CBRE Vantage Analytics. Role switching is a demo shortcut — production maps roles
+from CBRE SSO groups.
+
 ## Chunk roadmap
 
 Chunk 1 (done): shell, Dashboard, Monitoring, Birdseye, Ticketing, Integrations.
@@ -45,7 +60,10 @@ Chunk 2 (done): Capacity Planning, Operations Mgmt, Rounds & Shifts, Incidents, 
 read/write Ticketing + alarm ack + sync-event layer.
 Chunk 3 (done): HSE, Risk Mgmt, Projects with capital planning derived from asset lifecycle
 flags + maintenance spend (promote-to-project pushes to Autodesk Construction Cloud). All 13 modules are now built.
-Next: real Emerald token true-up (blocked on Chrome extension), real API/MCP integration layer.
+Chunk 4 (done, 2026-09-24): role-based shell + Executive view (client health list, 6 demo clients).
+Next: agentic capex planning — prompt-driven plan of where spend goes with smart suggestions from
+asset condition, maintenance history, alarms, and BMS/sensor data (Monitoring). Then the fuller
+client roster for the Executive view, real Emerald token true-up, real API/MCP integration layer.
 
 ## Repo
 

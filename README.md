@@ -40,6 +40,7 @@ Dev server: http://localhost:5180
 | HSE | 3 | ✅ Built — log/close observations, near misses, incidents; recordables tracking |
 | Risk Mgmt | 3 | ✅ Built — living register, 5×5 heat matrix, CBRE/Client/Shared ownership, review cadence |
 | Projects | 3 | ✅ Built — Kahua-synced opex/capex delivery + capital candidates auto-derived from asset lifecycle flags, promote-to-project |
+| Executive view | 4 | ✅ Built — role-switched interface (user menu → "Executive view"): client health list across DCS accounts with weighted risk, incidents/outages, capex/opex spend, fees & margins, service matrix |
 
 ### Push-pull, not read-only
 
@@ -54,9 +55,10 @@ production these events become API/MCP calls with returned references reconciled
 src/
   styles/        tokens.css (CBRE design tokens, both themes), base.css, shell.css
   data/          types.ts, sites.ts (the 10 sites), generate.ts (seeded generators), index.ts (store)
-  context/       AppContext (global site scope + theme)
+  context/       AppContext (global site scope + theme + role persona), DataContext (mutable store + sync events)
   components/    Sidebar, TopBar, ui.tsx (Card/StatTile/Badge/Segmented), charts.tsx, Icons
-  pages/         Dashboard, Monitoring, Birdseye, Ticketing, Integrations, Stub
+  pages/         one file per module + ExecutiveView (role: executive), Stub
+  data/clients.ts       DCS client roster + service lines; data/clientHealth.ts health/weighted-risk model
   modules.tsx    module registry (nav, chunks, planned integrations)
 ```
 
