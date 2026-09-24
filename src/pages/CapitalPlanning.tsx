@@ -492,8 +492,8 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
           </ul>
 
           {(r.tickets.length > 0 || r.risks.length > 0) && (
-            <>
-              <div className="card-title" style={{ marginTop: 14 }}><span>Linked work orders &amp; risks</span></div>
+            <div className="push-bottom">
+              <div className="card-title"><span>Linked work orders &amp; risks</span></div>
               <ul className="mini-list">
                 {r.tickets.map(t => (
                   <li key={t.id}>
@@ -508,7 +508,7 @@ function RecommendationDetail({ r, plan, chat, onAsk, onAccept, onDefer, onDismi
                   </li>
                 ))}
               </ul>
-            </>
+            </div>
           )}
 
         </div>
